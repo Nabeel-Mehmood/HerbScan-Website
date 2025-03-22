@@ -9,6 +9,19 @@ const Admin = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
+  // Search states for each tab
+  const [userSearchTerm, setUserSearchTerm] = useState('');
+  const [emailSearchTerm, setEmailSearchTerm] = useState('');
+  const [plantSearchTerm, setPlantSearchTerm] = useState('');
+
+  // Modal state for plant management
+  const [plantModalOpen, setPlantModalOpen] = useState(false);
+  const [plantModalMode, setPlantModalMode] = useState('add'); // 'add' or 'edit'
+  const [currentPlant, setCurrentPlant] = useState(null);
+
+  // Context menu state for plants (on right-click)
+  const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, plantId: null });
+
   // Protect admin route by ensuring the logged-in user is an admin.
   useEffect(() => {
     const userType = localStorage.getItem("userType");
@@ -17,23 +30,49 @@ const Admin = () => {
     }
   }, [navigate]);
 
-  // Update the current time every second
+  // Update the current time every second.
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // Dummy data for demonstration.
+  // Dummy Users
   const [users, setUsers] = useState([
     { id: 1, username: "user1", blocked: false },
     { id: 2, username: "user2", blocked: false },
   ]);
 
+  // Dummy Plants with extended fields.
   const [plants, setPlants] = useState([
-    { id: 1, name: "Rose", botanicalName: "Rosa", family: "Rosaceae" },
-    { id: 2, name: "Tulip", botanicalName: "Tulipa", family: "Liliaceae" },
+    { 
+      id: 1, 
+      familyName: "Rosaceae", 
+      subFamilyName: "Rosoideae", 
+      tribeName: "Roseae", 
+      botanicalName: "Rosa", 
+      commonName: "Rose", 
+      regionalName: "Gulab", 
+      agriculturalExistence: "Yes", 
+      seasonExistence: "Summer", 
+      medicinalProperties: "Anti-inflammatory", 
+      allergicProperties: "None" 
+    },
+    { 
+      id: 2, 
+      familyName: "Liliaceae", 
+      subFamilyName: "Lilioideae", 
+      tribeName: "Tulipeae", 
+      botanicalName: "Tulipa", 
+      commonName: "Tulip", 
+      regionalName: "Tulipa", 
+      agriculturalExistence: "Yes", 
+      seasonExistence: "Spring", 
+      medicinalProperties: "None", 
+      allergicProperties: "Mild" 
+    },
   ]);
 
+  // Dummy Emails
   const [emails] = useState([
     {
       id: 1,
@@ -59,34 +98,101 @@ const Admin = () => {
   };
 
   // --- Plant Management Functions ---
-  const handleAddPlant = (e) => {
-    e.preventDefault();
-    const { plantName, botanicalName, family } = e.target.elements;
-    const newPlant = {
-      id: plants.length + 1,
-      name: plantName.value.trim(),
-      botanicalName: botanicalName.value.trim(),
-      family: family.value.trim(),
-    };
+  const handleAddPlantSubmit = (plantData) => {
+    const newId = plants.length ? Math.max(...plants.map(p => p.id)) + 1 : 1;
+    const newPlant = { id: newId, ...plantData };
     setPlants([...plants, newPlant]);
-    e.target.reset();
   };
 
-  const handleRemovePlant = (id) => {
-    if (window.confirm("Are you sure you want to remove this plant?")) {
-      setPlants(plants.filter((plant) => plant.id !== id));
+  const handleEditPlantSubmit = (plantData) => {
+    setPlants(plants.map(p => p.id === plantData.id ? plantData : p));
+  };
+
+  const handleDeletePlant = (id) => {
+    if (window.confirm("Are you sure you want to delete this plant?")) {
+      setPlants(plants.filter(p => p.id !== id));
     }
+  };
+
+  // --- Modal Handlers ---
+  const openPlantModal = (mode, plant = null) => {
+    setPlantModalMode(mode);
+    setCurrentPlant(plant);
+    setPlantModalOpen(true);
+  };
+
+  const closePlantModal = () => {
+    setPlantModalOpen(false);
+    setCurrentPlant(null);
+  };
+
+  const handlePlantModalSubmit = (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const plantData = {
+      id: currentPlant ? currentPlant.id : null,
+      familyName: form.familyName.value.trim(),
+      subFamilyName: form.subFamilyName.value.trim(),
+      tribeName: form.tribeName.value.trim(),
+      botanicalName: form.botanicalName.value.trim(),
+      commonName: form.commonName.value.trim(),
+      regionalName: form.regionalName.value.trim(),
+      agriculturalExistence: form.agriculturalExistence.value.trim(),
+      seasonExistence: form.seasonExistence.value.trim(),
+      medicinalProperties: form.medicinalProperties.value.trim(),
+      allergicProperties: form.allergicProperties.value.trim()
+    };
+    if (plantModalMode === 'add') {
+      handleAddPlantSubmit(plantData);
+    } else {
+      handleEditPlantSubmit(plantData);
+    }
+    closePlantModal();
+  };
+
+  // --- Context Menu for Plants ---
+  const handlePlantRowContextMenu = (e, plantId) => {
+    e.preventDefault();
+    setContextMenu({ visible: true, x: e.clientX, y: e.clientY, plantId });
+  };
+
+  const handleHideContextMenu = () => {
+    setContextMenu({ ...contextMenu, visible: false });
   };
 
   // --- Email Response Handler ---
   const handleRespondEmail = (id) => {
-    // For now, simply alert. Later, you might open a modal or call an API.
     alert(`Responding to email with ID: ${id}`);
   };
 
+  // --- Filtered Data ---
+  const filteredUsers = users.filter(user =>
+    user.username.toLowerCase().includes(userSearchTerm.toLowerCase())
+  );
+
+  const filteredEmails = emails.filter(email =>
+    email.sender.toLowerCase().includes(emailSearchTerm.toLowerCase()) ||
+    email.subject.toLowerCase().includes(emailSearchTerm.toLowerCase())
+  );
+
+  const filteredPlants = plants.filter(plant => {
+    const term = plantSearchTerm.toLowerCase();
+    return (
+      plant.familyName.toLowerCase().includes(term) ||
+      plant.subFamilyName.toLowerCase().includes(term) ||
+      plant.tribeName.toLowerCase().includes(term) ||
+      plant.botanicalName.toLowerCase().includes(term) ||
+      plant.commonName.toLowerCase().includes(term) ||
+      plant.regionalName.toLowerCase().includes(term) ||
+      plant.agriculturalExistence.toLowerCase().includes(term) ||
+      plant.seasonExistence.toLowerCase().includes(term) ||
+      plant.medicinalProperties.toLowerCase().includes(term) ||
+      plant.allergicProperties.toLowerCase().includes(term)
+    );
+  });
+
   // --- Rendering Functions ---
 
-  // Dashboard now displays statistics, a live clock and a placeholder chart.
   const renderDashboard = () => (
     <div className="tab-content dashboard">
       <div className="dashboard-header">
@@ -116,7 +222,6 @@ const Admin = () => {
       <div className="dashboard-charts">
         <h3>Activity Graph</h3>
         <div className="chart-placeholder">
-          {/* Replace this placeholder with an actual chart component later */}
           <p>[Graph/Chart Placeholder]</p>
         </div>
       </div>
@@ -126,6 +231,14 @@ const Admin = () => {
   const renderUserManagement = () => (
     <div className="tab-content">
       <h2>User Management</h2>
+      <div className="search-container">
+        <input 
+          type="text" 
+          placeholder="Search Users..." 
+          value={userSearchTerm} 
+          onChange={(e) => setUserSearchTerm(e.target.value)} 
+        />
+      </div>
       <table>
         <thead>
           <tr>
@@ -136,7 +249,7 @@ const Admin = () => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
+          {filteredUsers.map((user) => (
             <tr key={user.id}>
               <td>{user.id}</td>
               <td>{user.username}</td>
@@ -157,54 +270,63 @@ const Admin = () => {
   const renderPlantManagement = () => (
     <div className="tab-content">
       <h2>Plant Management</h2>
-      <form onSubmit={handleAddPlant} className="plant-form">
-        <div className="form-group">
-          <label>Plant Name:</label>
-          <input type="text" name="plantName" required />
-        </div>
-        <div className="form-group">
-          <label>Botanical Name:</label>
-          <input type="text" name="botanicalName" required />
-        </div>
-        <div className="form-group">
-          <label>Family:</label>
-          <input type="text" name="family" required />
-        </div>
-        <button type="submit">Add Plant</button>
-      </form>
-      <h3>Existing Plants</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Plant Name</th>
-            <th>Botanical Name</th>
-            <th>Family</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {plants.map((plant) => (
-            <tr key={plant.id}>
-              <td>{plant.id}</td>
-              <td>{plant.name}</td>
-              <td>{plant.botanicalName}</td>
-              <td>{plant.family}</td>
-              <td>
-                <button onClick={() => handleRemovePlant(plant.id)}>
-                  Remove
-                </button>
-              </td>
+      <div className="plant-controls">
+        <input 
+          type="text" 
+          placeholder="Search Plants..." 
+          value={plantSearchTerm} 
+          onChange={(e) => setPlantSearchTerm(e.target.value)} 
+        />
+        <button onClick={() => openPlantModal('add')}>Add Plant</button>
+      </div>
+      <div className="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Family Name</th>
+              <th>Sub-Family Name</th>
+              <th>Tribe Name</th>
+              <th>Botanical Name</th>
+              <th>Common Name</th>
+              <th>Regional Name</th>
+              <th>Agricultural Existence</th>
+              <th>Season Existence</th>
+              <th>Medicinal Properties</th>
+              <th>Allergic Properties</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredPlants.map((plant) => (
+              <tr key={plant.id} onContextMenu={(e) => handlePlantRowContextMenu(e, plant.id)}>
+                <td>{plant.familyName}</td>
+                <td>{plant.subFamilyName}</td>
+                <td>{plant.tribeName}</td>
+                <td>{plant.botanicalName}</td>
+                <td>{plant.commonName}</td>
+                <td>{plant.regionalName}</td>
+                <td>{plant.agriculturalExistence}</td>
+                <td>{plant.seasonExistence}</td>
+                <td>{plant.medicinalProperties}</td>
+                <td>{plant.allergicProperties}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 
   const renderEmails = () => (
     <div className="tab-content">
       <h2>User Emails</h2>
+      <div className="search-container">
+        <input 
+          type="text" 
+          placeholder="Search Emails..." 
+          value={emailSearchTerm} 
+          onChange={(e) => setEmailSearchTerm(e.target.value)} 
+        />
+      </div>
       <table>
         <thead>
           <tr>
@@ -215,7 +337,7 @@ const Admin = () => {
           </tr>
         </thead>
         <tbody>
-          {emails.map((email) => (
+          {filteredEmails.map((email) => (
             <tr key={email.id}>
               <td>{email.id}</td>
               <td>{email.sender}</td>
@@ -233,7 +355,7 @@ const Admin = () => {
   );
 
   return (
-    <div className="admin-dashboard">
+    <div className="admin-dashboard" onClick={handleHideContextMenu}>
       <aside className={`admin-sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
         <div className="sidebar-header">
           <h2>{sidebarCollapsed ? "AP" : "Admin Panel"}</h2>
@@ -286,6 +408,90 @@ const Admin = () => {
         {selectedTab === "plantManagement" && renderPlantManagement()}
         {selectedTab === "emails" && renderEmails()}
       </main>
+
+      {/* Context Menu for Plants */}
+      {contextMenu.visible && (
+        <div 
+          className="context-menu" 
+          style={{ top: contextMenu.y, left: contextMenu.x }}
+          onClick={handleHideContextMenu}
+        >
+          <div 
+            className="context-menu-item" 
+            onClick={() => {
+              handleDeletePlant(contextMenu.plantId);
+              handleHideContextMenu();
+            }}
+          >
+            Delete
+          </div>
+          <div 
+            className="context-menu-item" 
+            onClick={() => {
+              const plantToEdit = plants.find(p => p.id === contextMenu.plantId);
+              openPlantModal('edit', plantToEdit);
+              handleHideContextMenu();
+            }}
+          >
+            Edit
+          </div>
+        </div>
+      )}
+
+      {/* Modal for Add/Edit Plant */}
+      {plantModalOpen && (
+        <div className="modal-overlay" onClick={closePlantModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>{plantModalMode === 'add' ? 'Add Plant' : 'Edit Plant'}</h3>
+            <form onSubmit={handlePlantModalSubmit}>
+              <div className="form-group">
+                <label>Family Name:</label>
+                <input type="text" name="familyName" defaultValue={currentPlant ? currentPlant.familyName : ''} required />
+              </div>
+              <div className="form-group">
+                <label>Sub-Family Name:</label>
+                <input type="text" name="subFamilyName" defaultValue={currentPlant ? currentPlant.subFamilyName : ''} required />
+              </div>
+              <div className="form-group">
+                <label>Tribe Name:</label>
+                <input type="text" name="tribeName" defaultValue={currentPlant ? currentPlant.tribeName : ''} required />
+              </div>
+              <div className="form-group">
+                <label>Botanical Name:</label>
+                <input type="text" name="botanicalName" defaultValue={currentPlant ? currentPlant.botanicalName : ''} required />
+              </div>
+              <div className="form-group">
+                <label>Common Name:</label>
+                <input type="text" name="commonName" defaultValue={currentPlant ? currentPlant.commonName : ''} required />
+              </div>
+              <div className="form-group">
+                <label>Regional Name:</label>
+                <input type="text" name="regionalName" defaultValue={currentPlant ? currentPlant.regionalName : ''} required />
+              </div>
+              <div className="form-group">
+                <label>Agricultural Existence:</label>
+                <input type="text" name="agriculturalExistence" defaultValue={currentPlant ? currentPlant.agriculturalExistence : ''} required />
+              </div>
+              <div className="form-group">
+                <label>Season Existence:</label>
+                <input type="text" name="seasonExistence" defaultValue={currentPlant ? currentPlant.seasonExistence : ''} required />
+              </div>
+              <div className="form-group">
+                <label>Medicinal Properties:</label>
+                <input type="text" name="medicinalProperties" defaultValue={currentPlant ? currentPlant.medicinalProperties : ''} required />
+              </div>
+              <div className="form-group">
+                <label>Allergic Properties:</label>
+                <input type="text" name="allergicProperties" defaultValue={currentPlant ? currentPlant.allergicProperties : ''} required />
+              </div>
+              <div className="modal-buttons">
+                <button type="submit">{plantModalMode === 'add' ? 'Add' : 'Update'}</button>
+                <button type="button" onClick={closePlantModal}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
