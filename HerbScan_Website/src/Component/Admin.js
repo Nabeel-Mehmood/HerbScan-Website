@@ -25,7 +25,7 @@ const Admin = () => {
     { id: 2, name: "Tulip", botanicalName: "Tulipa", family: "Liliaceae" },
   ]);
 
-  const [emails, setEmails] = useState([
+  const [emails] = useState([
     {
       id: 1,
       sender: "user1@example.com",
