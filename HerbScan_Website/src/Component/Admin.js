@@ -6,6 +6,8 @@ import './Admin.css';
 const Admin = () => {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState("dashboard");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   // Protect admin route by ensuring the logged-in user is an admin.
   useEffect(() => {
@@ -14,6 +16,12 @@ const Admin = () => {
       navigate("/login", { replace: true });
     }
   }, [navigate]);
+
+  // Update the current time every second
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Dummy data for demonstration.
   const [users, setUsers] = useState([
@@ -77,10 +85,41 @@ const Admin = () => {
   };
 
   // --- Rendering Functions ---
+
+  // Dashboard now displays statistics, a live clock and a placeholder chart.
   const renderDashboard = () => (
-    <div className="tab-content">
-      <h2>Welcome, Admin!</h2>
-      <p>Manage platform details using the options in the sidebar.</p>
+    <div className="tab-content dashboard">
+      <div className="dashboard-header">
+        <h2>Dashboard Overview</h2>
+        <div className="date-time">
+          {currentTime.toLocaleDateString()} {currentTime.toLocaleTimeString()}
+        </div>
+      </div>
+      <div className="stats-cards">
+        <div className="card">
+          <h3>Total Users</h3>
+          <p>{users.length}</p>
+        </div>
+        <div className="card">
+          <h3>Total Plants</h3>
+          <p>{plants.length}</p>
+        </div>
+        <div className="card">
+          <h3>Emails Received</h3>
+          <p>{emails.length}</p>
+        </div>
+        <div className="card">
+          <h3>Blocked Users</h3>
+          <p>{users.filter(u => u.blocked).length}</p>
+        </div>
+      </div>
+      <div className="dashboard-charts">
+        <h3>Activity Graph</h3>
+        <div className="chart-placeholder">
+          {/* Replace this placeholder with an actual chart component later */}
+          <p>[Graph/Chart Placeholder]</p>
+        </div>
+      </div>
     </div>
   );
 
@@ -195,34 +234,40 @@ const Admin = () => {
 
   return (
     <div className="admin-dashboard">
-      <aside className="admin-sidebar">
+      <aside className={`admin-sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
         <div className="sidebar-header">
-          <h2>Admin Panel</h2>
+          <h2>{sidebarCollapsed ? "AP" : "Admin Panel"}</h2>
+          <button
+            className="collapse-toggle"
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          >
+            {sidebarCollapsed ? "→" : "←"}
+          </button>
         </div>
         <ul className="sidebar-menu">
           <li
             className={selectedTab === "dashboard" ? "active" : ""}
             onClick={() => setSelectedTab("dashboard")}
           >
-            Dashboard
+            {sidebarCollapsed ? "D" : "Dashboard"}
           </li>
           <li
             className={selectedTab === "userManagement" ? "active" : ""}
             onClick={() => setSelectedTab("userManagement")}
           >
-            User Management
+            {sidebarCollapsed ? "U" : "User Management"}
           </li>
           <li
             className={selectedTab === "plantManagement" ? "active" : ""}
             onClick={() => setSelectedTab("plantManagement")}
           >
-            Plant Management
+            {sidebarCollapsed ? "P" : "Plant Management"}
           </li>
           <li
             className={selectedTab === "emails" ? "active" : ""}
             onClick={() => setSelectedTab("emails")}
           >
-            Emails
+            {sidebarCollapsed ? "E" : "Emails"}
           </li>
           <li
             className="signout"
@@ -231,7 +276,7 @@ const Admin = () => {
               navigate("/login", { replace: true });
             }}
           >
-            Sign Out
+            {sidebarCollapsed ? "X" : "Sign Out"}
           </li>
         </ul>
       </aside>
