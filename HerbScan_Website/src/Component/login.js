@@ -1,3 +1,4 @@
+// ./Component/login.js
 import React, { useState, useEffect } from 'react'; 
 import './login.css'; 
 import Logo from '../Assets/logo.png'; 
@@ -22,30 +23,42 @@ function Login() {
   };
 
   const validateEmail = (email) => {
-    return email.includes('@') && email.endsWith('gmail.com');
+    return email.endsWith('@gmail.com');
   };
 
   const handleSubmit = () => {
+    // --- ADMIN LOGIN CHECK ---
+    if (credentials.email === "Admin_123" && credentials.password === "12345678") {
+      localStorage.setItem('userType', 'admin');
+      localStorage.setItem('isLoggedIn', 'true');
+      window.location.href = '/admin';
+      return;
+    }
+
     if (isSignUp) {
       if (!credentials.name || !credentials.email || !credentials.password || !validateEmail(credentials.email)) {
         setError('Please fill out all fields with valid information.');
         return;
       }
-      // Save credentials
+      // Save credentials for sign-up.
       localStorage.setItem('user', JSON.stringify(credentials));
       setIsSignUp(false);
       setError('');
-      // Directly log in the user
+      // Log in the new user.
+      localStorage.setItem('userType', 'user');
+      localStorage.setItem('isLoggedIn', 'true');
       window.location.href = '/';
     } else {
       if (!credentials.email || !credentials.password || !validateEmail(credentials.email)) {
         setError('Please fill out all fields with valid information.');
         return;
       }
-      // Login process
+      // Regular user login process.
       const storedCredentials = JSON.parse(localStorage.getItem('user'));
       if (storedCredentials && storedCredentials.email === credentials.email && storedCredentials.password === credentials.password) {
-        window.location.href = '/'; // Redirect to home page
+        localStorage.setItem('userType', 'user');
+        localStorage.setItem('isLoggedIn', 'true');
+        window.location.href = '/';
       } else {
         setError('Incorrect credentials, please try again.');
       }
@@ -59,7 +72,7 @@ function Login() {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Perform any action needed on scroll (if necessary)
+      // If needed, perform actions on scroll
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -72,7 +85,9 @@ function Login() {
       <div className="login-left">
         <div className="floating-image-wrapper">
           <img src={SignupRightBg} alt="Background" className="background-image" />
-          <div className="text-overlay" onClick={() => window.location.href = '/'}>Scan with HerbScan</div>
+          <div className="text-overlay" onClick={() => window.location.href = '/'}>
+            Scan with HerbScan
+          </div>
         </div>
       </div>
 
@@ -96,10 +111,14 @@ function Login() {
             <input type="password" name="password" placeholder="Enter your password" onChange={handleInputChange} />
           </div>
           {error && <p className="error">{error}</p>}
-          <button className="signup-button fade-in" onClick={handleSubmit}>{isSignUp ? 'Sign Up' : 'Login'}</button>
+          <button className="signup-button fade-in" onClick={handleSubmit}>
+            {isSignUp ? 'Sign Up' : 'Login'}
+          </button>
           <p className="login-prompt">
             {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
-            <button className="link-button" onClick={toggleSignUp}>{isSignUp ? 'Login' : 'Sign Up'}</button>
+            <button className="link-button" onClick={toggleSignUp}>
+              {isSignUp ? 'Login' : 'Sign Up'}
+            </button>
           </p>
         </div>
       </div>
