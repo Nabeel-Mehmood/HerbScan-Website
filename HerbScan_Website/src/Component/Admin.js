@@ -1,6 +1,7 @@
+// ./Component/Admin.js
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Admin.css'; // Optional: add custom styles for your admin dashboard
+import './Admin.css';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -71,22 +72,22 @@ const Admin = () => {
 
   // --- Email Response Handler ---
   const handleRespondEmail = (id) => {
-    // For now, we simply alert – later, you could show a form or use an API.
+    // For now, simply alert. Later, you might open a modal or call an API.
     alert(`Responding to email with ID: ${id}`);
   };
 
   // --- Rendering Functions ---
   const renderDashboard = () => (
-    <div>
+    <div className="tab-content">
       <h2>Welcome, Admin!</h2>
-      <p>Select an option from the menu above to manage the platform details.</p>
+      <p>Manage platform details using the options in the sidebar.</p>
     </div>
   );
 
   const renderUserManagement = () => (
-    <div>
+    <div className="tab-content">
       <h2>User Management</h2>
-      <table border="1" cellPadding="8">
+      <table>
         <thead>
           <tr>
             <th>ID</th>
@@ -104,10 +105,8 @@ const Admin = () => {
               <td>
                 <button onClick={() => handleBlockUser(user.id)}>
                   {user.blocked ? "Unblock" : "Block"}
-                </button>{" "}
-                <button onClick={() => handleRemoveUser(user.id)}>
-                  Remove
                 </button>
+                <button onClick={() => handleRemoveUser(user.id)}>Remove</button>
               </td>
             </tr>
           ))}
@@ -117,25 +116,25 @@ const Admin = () => {
   );
 
   const renderPlantManagement = () => (
-    <div>
+    <div className="tab-content">
       <h2>Plant Management</h2>
-      <form onSubmit={handleAddPlant}>
-        <div>
-          <label>Plant Name: </label>
+      <form onSubmit={handleAddPlant} className="plant-form">
+        <div className="form-group">
+          <label>Plant Name:</label>
           <input type="text" name="plantName" required />
         </div>
-        <div>
-          <label>Botanical Name: </label>
+        <div className="form-group">
+          <label>Botanical Name:</label>
           <input type="text" name="botanicalName" required />
         </div>
-        <div>
-          <label>Family: </label>
+        <div className="form-group">
+          <label>Family:</label>
           <input type="text" name="family" required />
         </div>
         <button type="submit">Add Plant</button>
       </form>
       <h3>Existing Plants</h3>
-      <table border="1" cellPadding="8">
+      <table>
         <thead>
           <tr>
             <th>ID</th>
@@ -165,9 +164,9 @@ const Admin = () => {
   );
 
   const renderEmails = () => (
-    <div>
+    <div className="tab-content">
       <h2>User Emails</h2>
-      <table border="1" cellPadding="8">
+      <table>
         <thead>
           <tr>
             <th>ID</th>
@@ -196,32 +195,52 @@ const Admin = () => {
 
   return (
     <div className="admin-dashboard">
-      <h1>Admin Dashboard</h1>
-      <nav className="admin-nav">
-        <button onClick={() => setSelectedTab("dashboard")}>Dashboard</button>
-        <button onClick={() => setSelectedTab("userManagement")}>
-          User Management
-        </button>
-        <button onClick={() => setSelectedTab("plantManagement")}>
-          Plant Management
-        </button>
-        <button onClick={() => setSelectedTab("emails")}>Emails</button>
-        <button
-          onClick={() => {
-            // Clearing localStorage logs out the admin.
-            localStorage.clear();
-            navigate("/login", { replace: true });
-          }}
-        >
-          Sign Out
-        </button>
-      </nav>
-      <div className="admin-content">
+      <aside className="admin-sidebar">
+        <div className="sidebar-header">
+          <h2>Admin Panel</h2>
+        </div>
+        <ul className="sidebar-menu">
+          <li
+            className={selectedTab === "dashboard" ? "active" : ""}
+            onClick={() => setSelectedTab("dashboard")}
+          >
+            Dashboard
+          </li>
+          <li
+            className={selectedTab === "userManagement" ? "active" : ""}
+            onClick={() => setSelectedTab("userManagement")}
+          >
+            User Management
+          </li>
+          <li
+            className={selectedTab === "plantManagement" ? "active" : ""}
+            onClick={() => setSelectedTab("plantManagement")}
+          >
+            Plant Management
+          </li>
+          <li
+            className={selectedTab === "emails" ? "active" : ""}
+            onClick={() => setSelectedTab("emails")}
+          >
+            Emails
+          </li>
+          <li
+            className="signout"
+            onClick={() => {
+              localStorage.clear();
+              navigate("/login", { replace: true });
+            }}
+          >
+            Sign Out
+          </li>
+        </ul>
+      </aside>
+      <main className="admin-main">
         {selectedTab === "dashboard" && renderDashboard()}
         {selectedTab === "userManagement" && renderUserManagement()}
         {selectedTab === "plantManagement" && renderPlantManagement()}
         {selectedTab === "emails" && renderEmails()}
-      </div>
+      </main>
     </div>
   );
 };
