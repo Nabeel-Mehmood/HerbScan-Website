@@ -5,7 +5,8 @@ import Login from './Component/login';
 import Explore from './Component/explore';
 import Contact from './Component/contact';
 import History from './Component/history';
-import Setting from './Component/settings'
+import Setting from './Component/settings';
+import Admin from './Component/Admin';
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/history" element={<History />} />
         <Route path="/settings" element={<Setting />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
     </Router>
   );
