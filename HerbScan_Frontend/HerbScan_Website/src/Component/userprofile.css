@@ -1,0 +1,98 @@
+.user-profile-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  width: 250px;
+  z-index: 1000;
+  opacity: 0;
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.profile-picture {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 1rem;
+  opacity: 0;
+  animation: fadeIn 0.5s ease-in-out 0.2s forwards;
+}
+
+.user-details {
+  flex: 1;
+}
+
+.user-details h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.profile-actions {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-actions button {
+  padding: 0.8rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  opacity: 0;
+  animation: fadeIn 0.5s ease-in-out 0.4s forwards;
+}
+
+.profile-actions button:hover {
+  background: #f5f5f5;
+}
+
+.logout-button {
+  display: flex; /* Flexbox to center text */
+  justify-content: center; /* Horizontally center text */
+  align-items: center; /* Vertically center text */
+  margin: 1rem auto; /* Center horizontally and add vertical spacing */
+  padding: 0.8rem 1.5rem; /* Padding for size */
+  font-size: 1rem; /* Adjust font size */
+  font-weight: bold;
+  color: #333; /* Darker text color for contrast */
+  background-color: #f9f9f9; /* Light background color */
+  border: 2px solid #b4b3b3; /* Add a visible gray border */
+  border-radius: 8px; /* Rounded corners */
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease; /* Smooth transitions */
+  width: calc(100% - 2rem); /* Fits nicely within dropdown */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  opacity: 0;
+  animation: fadeIn 0.5s ease-in-out 0.6s forwards;
+}
+
+.logout-button:hover {
+  background-color: #f0f0f0; /* Slightly darker background on hover */
+  border-color: #999; /* Darker border on hover */
+  color: #000; /* Darker text on hover */
+}
+
+/* Keyframe Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
