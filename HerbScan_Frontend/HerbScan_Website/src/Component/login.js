@@ -1,83 +1,92 @@
-// ./Component/login.js
-import React, { useState, useEffect } from 'react'; 
-import './login.css'; 
-import Logo from '../Assets/logo.png'; 
-import SignupBg from '../Assets/Signup_bg.jpg'; 
+// login.js
+import React, { useState } from 'react';
+import './login.css';
+import Logo from '../Assets/logo.png';
+import SignupBg from '../Assets/Signup_bg.jpg';
 import SignupRightBg from '../Assets/Signup_rigjt_bg.jpg';
 
 function Login() {
-  const [isSignUp, setIsSignUp] = useState(true);
+  // Default to login mode.
+  const [isSignUp, setIsSignUp] = useState(false);
   const [credentials, setCredentials] = useState({
     name: '',
     email: '',
     password: ''
   });
   const [error, setError] = useState('');
+  
+  // Use API URL from the environment; fallback to localhost.
+  const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/auth';
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setCredentials(prevCredentials => ({
-      ...prevCredentials,
-      [name]: value
-    }));
+    setCredentials(prev => ({ ...prev, [name]: value }));
   };
 
-  const validateEmail = (email) => {
-    return email.endsWith('@gmail.com');
-  };
+  // Simple validation: for regular users, require a Gmail address.
+  const validateEmail = (email) => email.endsWith('@gmail.com');
 
-  const handleSubmit = () => {
-    // --- ADMIN LOGIN CHECK ---
-    if (credentials.email === "Admin_123" && credentials.password === "12345678") {
-      localStorage.setItem('userType', 'admin');
-      localStorage.setItem('isLoggedIn', 'true');
-      window.location.href = '/admin';
-      return;
-    }
-
-    if (isSignUp) {
-      if (!credentials.name || !credentials.email || !credentials.password || !validateEmail(credentials.email)) {
-        setError('Please fill out all fields with valid information.');
+  const handleSubmit = async () => {
+    try {
+      if (!credentials.email || !credentials.password) {
+        setError('Please enter both email and password.');
         return;
       }
-      // Save credentials for sign-up.
-      localStorage.setItem('user', JSON.stringify(credentials));
-      setIsSignUp(false);
-      setError('');
-      // Log in the new user.
-      localStorage.setItem('userType', 'user');
-      localStorage.setItem('isLoggedIn', 'true');
-      window.location.href = '/';
-    } else {
-      if (!credentials.email || !credentials.password || !validateEmail(credentials.email)) {
-        setError('Please fill out all fields with valid information.');
+      
+      // If admin, use the dedicated admin endpoint.
+      if (credentials.email.toLowerCase() === 'admin@gmail.com') {
+        const endpoint = `${apiUrl}/admin/login`;
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ email: credentials.email, password: credentials.password })
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || 'Something went wrong.');
+        }
+        window.location.href = '/admin';
         return;
       }
-      // Regular user login process.
-      const storedCredentials = JSON.parse(localStorage.getItem('user'));
-      if (storedCredentials && storedCredentials.email === credentials.email && storedCredentials.password === credentials.password) {
-        localStorage.setItem('userType', 'user');
-        localStorage.setItem('isLoggedIn', 'true');
-        window.location.href = '/';
-      } else {
-        setError('Incorrect credentials, please try again.');
+      
+      // Regular user flows.
+      if (isSignUp) {
+        if (!credentials.name) {
+          setError('Please enter your name.');
+          return;
+        }
+        if (!validateEmail(credentials.email)) {
+          setError('Please use a valid Gmail address.');
+          return;
+        }
       }
+      const endpoint = isSignUp ? `${apiUrl}/signup` : `${apiUrl}/login`;
+      const body = isSignUp 
+          ? { name: credentials.name, email: credentials.email, password: credentials.password }
+          : { email: credentials.email, password: credentials.password };
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(body)
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Something went wrong.');
+      }
+      window.location.href = data.user.role === 'admin' ? '/admin' : '/';
+    } catch (error) {
+      setError(error.message);
+      console.error('Authentication error:', error);
     }
   };
 
   const toggleSignUp = () => {
-    setIsSignUp(prev => !prev);
+    setIsSignUp(!isSignUp);
     setError('');
   };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      // If needed, perform actions on scroll
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   return (
     <div className="login-container" style={{ backgroundImage: `url(${SignupBg})` }}>
@@ -90,7 +99,6 @@ function Login() {
           </div>
         </div>
       </div>
-
       {/* Right Section */}
       <div className="login-right">
         <div className="signup-form">
