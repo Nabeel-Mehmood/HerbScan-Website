@@ -1,6 +1,7 @@
 // ./Component/Admin.js
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './Admin.css';
 
 const Admin = () => {
@@ -8,6 +9,9 @@ const Admin = () => {
   const [selectedTab, setSelectedTab] = useState("dashboard");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [users, setUsers] = useState([]);
+  const [plants, setPlants] = useState([]);
+  const [emails, setEmails] = useState([]);
 
   // Search states for each tab
   const [userSearchTerm, setUserSearchTerm] = useState('');
@@ -22,12 +26,19 @@ const Admin = () => {
   // Context menu state for plants (on right-click)
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, plantId: null });
 
-  // Protect admin route by ensuring the logged-in user is an admin.
+  // Protect admin route using session-based authentication.
   useEffect(() => {
-    const userType = localStorage.getItem("userType");
-    if (userType !== "admin") {
-      navigate("/login", { replace: true });
-    }
+    const checkSession = async () => {
+      try {
+        const response = await axios.get('/api/auth/session', { withCredentials: true });
+        if (response.data.user.role !== 'admin') {
+          navigate('/login', { replace: true });
+        }
+      } catch (error) {
+        navigate('/login', { replace: true });
+      }
+    };
+    checkSession();
   }, [navigate]);
 
   // Update the current time every second.
@@ -36,51 +47,59 @@ const Admin = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Dummy Users
-  const [users, setUsers] = useState([
-    { id: 1, username: "user1", blocked: false },
-    { id: 2, username: "user2", blocked: false },
-  ]);
+  // Dummy data setup for Users, Plants, and Emails
+  useEffect(() => {
+    setUsers([
+      { id: 1, username: "user1", blocked: false },
+      { id: 2, username: "user2", blocked: false },
+    ]);
+    setPlants([
+      { 
+        id: 1, 
+        familyName: "Rosaceae", 
+        subFamilyName: "Rosoideae", 
+        tribeName: "Roseae", 
+        botanicalName: "Rosa", 
+        commonName: "Rose", 
+        regionalName: "Gulab", 
+        agriculturalExistence: "Yes", 
+        seasonExistence: "Summer", 
+        medicinalProperties: "Anti-inflammatory", 
+        allergicProperties: "None" 
+      },
+      { 
+        id: 2, 
+        familyName: "Liliaceae", 
+        subFamilyName: "Lilioideae", 
+        tribeName: "Tulipeae", 
+        botanicalName: "Tulipa", 
+        commonName: "Tulip", 
+        regionalName: "Tulipa", 
+        agriculturalExistence: "Yes", 
+        seasonExistence: "Spring", 
+        medicinalProperties: "None", 
+        allergicProperties: "Mild" 
+      },
+    ]);
+    setEmails([
+      {
+        id: 1,
+        sender: "user1@example.com",
+        subject: "Issue with image upload",
+        content: "I encountered an error while uploading my image.",
+      },
+    ]);
+  }, []);
 
-  // Dummy Plants with extended fields.
-  const [plants, setPlants] = useState([
-    { 
-      id: 1, 
-      familyName: "Rosaceae", 
-      subFamilyName: "Rosoideae", 
-      tribeName: "Roseae", 
-      botanicalName: "Rosa", 
-      commonName: "Rose", 
-      regionalName: "Gulab", 
-      agriculturalExistence: "Yes", 
-      seasonExistence: "Summer", 
-      medicinalProperties: "Anti-inflammatory", 
-      allergicProperties: "None" 
-    },
-    { 
-      id: 2, 
-      familyName: "Liliaceae", 
-      subFamilyName: "Lilioideae", 
-      tribeName: "Tulipeae", 
-      botanicalName: "Tulipa", 
-      commonName: "Tulip", 
-      regionalName: "Tulipa", 
-      agriculturalExistence: "Yes", 
-      seasonExistence: "Spring", 
-      medicinalProperties: "None", 
-      allergicProperties: "Mild" 
-    },
-  ]);
-
-  // Dummy Emails
-  const [emails] = useState([
-    {
-      id: 1,
-      sender: "user1@example.com",
-      subject: "Issue with image upload",
-      content: "I encountered an error while uploading my image.",
-    },
-  ]);
+  // Logout handler
+  const handleSignOut = async () => {
+    try {
+      await axios.post('/api/auth/logout', {}, { withCredentials: true });
+      navigate('/login', { replace: true });
+    } catch (error) {
+      console.error('Logout failed', error);
+    }
+  };
 
   // --- User Management Functions ---
   const handleBlockUser = (id) => {
