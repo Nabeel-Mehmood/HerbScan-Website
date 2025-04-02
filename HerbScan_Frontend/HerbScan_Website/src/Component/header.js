@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './header.css';
 import Logo from '../Assets/logo.png';
-import ProfileImage from '../Assets/userprofile_image.jpg'; 
-import UserProfile from './userprofile'; 
+import ProfileImage from '../Assets/userprofile_image.jpg';
+import UserProfile from './userprofile';
 
 function Header({ showSearchBar = true }) {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -11,39 +11,57 @@ function Header({ showSearchBar = true }) {
   const [user, setUser] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
 
+  // Consistent API URL using environment variables.
+  const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/auth';
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-useEffect(() => {
-    // Check if user data exists in localStorage
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+  useEffect(() => {
+    const verifyAuth = async () => {
       try {
-        const parsedUser = JSON.parse(storedUser);
-        if (parsedUser.email && parsedUser.password) {
+        const response = await fetch(`${apiUrl}/session`, {
+          credentials: 'include',
+        });
+        if (response.ok) {
+          const data = await response.json();
           setIsLoggedIn(true);
-          setUser(parsedUser);
+          setUser(data.user);
         } else {
-          localStorage.removeItem('user'); // Remove invalid user data
+          setIsLoggedIn(false);
+          setUser(null);
         }
       } catch (error) {
-        console.error('Error parsing user data:', error);
-        localStorage.removeItem('user'); // Clear corrupted data
+        console.error('Auth verification failed:', error);
+        setIsLoggedIn(false);
+        setUser(null);
       }
-    }
-  }, []);
+    };
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    setIsLoggedIn(false);
-    setUser(null);
-    window.location.href = '/';
+    verifyAuth();
+  }, [apiUrl]);
+
+  const handleLogout = async (shouldRedirect) => {
+    try {
+      const response = await fetch(`${apiUrl}/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      if (response.ok) {
+        setIsLoggedIn(false);
+        setUser(null);
+        if (shouldRedirect && window.location.pathname !== '/') {
+          window.location.href = '/';
+        }
+      }
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   const toggleDropdown = () => {
@@ -69,18 +87,27 @@ useEffect(() => {
           <li><Link to="/">Home</Link></li>
           <li><Link to="/explore">Explore</Link></li>
           <li><Link to="/contact">Contact Us</Link></li>
+          {user?.role === 'admin' && <li><Link to="/admin">Admin</Link></li>}
         </ul>
         {!isScrolled && (
           isLoggedIn ? (
             <div className="user-profile-container">
-              <img src={ProfileImage} alt="Profile" className="profile-icon" onClick={toggleDropdown} />
-              {showDropdown && <UserProfile user={user} onLogout={handleLogout} />}
+              <img
+                src={ProfileImage}
+                alt="Profile"
+                className="profile-icon"
+                onClick={toggleDropdown}
+              />
+              {showDropdown && (
+                <UserProfile
+                  user={user}
+                  onLogout={() => handleLogout(true)}
+                  onProfileClick={() => window.location.href = '/profile'}
+                />
+              )}
             </div>
           ) : (
-            <button
-              className="signup-btn"
-              onClick={() => (window.location.href = '/login')}
-            >
+            <button className="signup-btn" onClick={() => window.location.href = '/login'}>
               Sign Up
             </button>
           )
