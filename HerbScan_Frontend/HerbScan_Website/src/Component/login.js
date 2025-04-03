@@ -83,6 +83,20 @@ function Login() {
     }
   };
 
+  const handleKeyDown = (e, fieldName) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const formElements = ['name', 'email', 'password'];
+      const currentIndex = formElements.indexOf(fieldName);
+
+      if (currentIndex < formElements.length - 1) {
+        document.getElementsByName(formElements[currentIndex + 1])[0].focus();
+      } else {
+        handleSubmit();
+      }
+    }
+  };
+
   const toggleSignUp = () => {
     setIsSignUp(!isSignUp);
     setError('');
@@ -107,16 +121,34 @@ function Login() {
           {isSignUp && (
             <div className="input-group fade-in">
               <label>Name</label>
-              <input type="text" name="name" placeholder="Enter your name" onChange={handleInputChange} />
+              <input 
+                type="text" 
+                name="name" 
+                placeholder="Enter your name" 
+                onChange={handleInputChange} 
+                onKeyDown={(e) => handleKeyDown(e, 'name')}
+              />
             </div>
           )}
           <div className="input-group fade-in">
             <label>Email</label>
-            <input type="email" name="email" placeholder="Enter your email" onChange={handleInputChange} />
+            <input 
+              type="email" 
+              name="email" 
+              placeholder="Enter your email" 
+              onChange={handleInputChange} 
+              onKeyDown={(e) => handleKeyDown(e, 'email')}
+            />
           </div>
           <div className="input-group fade-in">
             <label>Password</label>
-            <input type="password" name="password" placeholder="Enter your password" onChange={handleInputChange} />
+            <input 
+              type="password" 
+              name="password" 
+              placeholder="Enter your password" 
+              onChange={handleInputChange} 
+              onKeyDown={(e) => handleKeyDown(e, 'password')}
+            />
           </div>
           {error && <p className="error">{error}</p>}
           <button className="signup-button fade-in" onClick={handleSubmit}>
