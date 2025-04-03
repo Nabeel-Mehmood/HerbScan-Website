@@ -4,26 +4,38 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Admin.css';
 
+// Helper function to generate a unique ID (for display only)
+// Only used for users since the backend returns only "name" and "blocked".
+const generateUniqueId = () =>
+  '_' + Math.random().toString(36).substr(2, 9);
+
 const Admin = () => {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState("dashboard");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  // State arrays for data from the backend.
   const [users, setUsers] = useState([]);
   const [plants, setPlants] = useState([]);
   const [emails, setEmails] = useState([]);
 
-  // Search states for each tab
-  const [userSearchTerm, setUserSearchTerm] = useState('');
+  // New states for email modal and multiple email selection.
   const [emailSearchTerm, setEmailSearchTerm] = useState('');
+  const [selectedEmails, setSelectedEmails] = useState([]);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [currentEmail, setCurrentEmail] = useState(null);
+
+  // Search states for users and plants.
+  const [userSearchTerm, setUserSearchTerm] = useState('');
   const [plantSearchTerm, setPlantSearchTerm] = useState('');
 
-  // Modal state for plant management
+  // Modal state for plant management.
   const [plantModalOpen, setPlantModalOpen] = useState(false);
   const [plantModalMode, setPlantModalMode] = useState('add'); // 'add' or 'edit'
   const [currentPlant, setCurrentPlant] = useState(null);
 
-  // Context menu state for plants (on right-click)
+  // Context menu state for plants (on right-click).
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, plantId: null });
 
   // Protect admin route using session-based authentication.
@@ -47,51 +59,55 @@ const Admin = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Dummy data setup for Users, Plants, and Emails
-  useEffect(() => {
-    setUsers([
-      { id: 1, username: "user1", blocked: false },
-      { id: 2, username: "user2", blocked: false },
-    ]);
-    setPlants([
-      { 
-        id: 1, 
-        familyName: "Rosaceae", 
-        subFamilyName: "Rosoideae", 
-        tribeName: "Roseae", 
-        botanicalName: "Rosa", 
-        commonName: "Rose", 
-        regionalName: "Gulab", 
-        agriculturalExistence: "Yes", 
-        seasonExistence: "Summer", 
-        medicinalProperties: "Anti-inflammatory", 
-        allergicProperties: "None" 
-      },
-      { 
-        id: 2, 
-        familyName: "Liliaceae", 
-        subFamilyName: "Lilioideae", 
-        tribeName: "Tulipeae", 
-        botanicalName: "Tulipa", 
-        commonName: "Tulip", 
-        regionalName: "Tulipa", 
-        agriculturalExistence: "Yes", 
-        seasonExistence: "Spring", 
-        medicinalProperties: "None", 
-        allergicProperties: "Mild" 
-      },
-    ]);
-    setEmails([
-      {
-        id: 1,
-        sender: "user1@example.com",
-        subject: "Issue with image upload",
-        content: "I encountered an error while uploading my image.",
-      },
-    ]);
-  }, []);
+  // Fetch real user data from the backend.
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get('/api/users', { withCredentials: true });
+      // Map the user records to add a locally generated unique _id for display.
+      const usersWithId = response.data.map(user => ({
+        ...user,
+        _id: generateUniqueId()
+      }));
+      setUsers(usersWithId);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
 
-  // Logout handler
+  // Fetch plants from the backend.
+  const fetchPlants = async () => {
+    try {
+      const response = await axios.get('/api/plants', { withCredentials: true });
+      setPlants(response.data);
+    } catch (error) {
+      console.error('Error fetching plants:', error);
+    }
+  };
+
+  // Fetch emails from the backend.
+  const fetchEmails = async () => {
+    try {
+      const response = await axios.get('/api/emails', { withCredentials: true });
+      setEmails(response.data);
+    } catch (error) {
+      console.error('Error fetching emails:', error);
+    }
+  };
+
+  // Refresh data whenever the selected tab changes.
+  useEffect(() => {
+    if (selectedTab === "dashboard" || selectedTab === "userManagement") {
+      fetchUsers();
+    }
+    if (selectedTab === "dashboard" || selectedTab === "plantManagement") {
+      fetchPlants();
+    }
+    if (selectedTab === "dashboard" || selectedTab === "emails") {
+      fetchEmails();
+    }
+  }, [selectedTab]);
+
+  // Logout handler.
   const handleSignOut = async () => {
     try {
       await axios.post('/api/auth/logout', {}, { withCredentials: true });
@@ -102,38 +118,58 @@ const Admin = () => {
   };
 
   // --- User Management Functions ---
-  const handleBlockUser = (id) => {
-    setUsers(
-      users.map((user) =>
-        user.id === id ? { ...user, blocked: !user.blocked } : user
-      )
-    );
+  // Uses user.name as identifier when calling backend endpoints.
+  const handleBlockUser = async (userName) => {
+    try {
+      await axios.patch(`/api/users/${userName}/block`, {}, { withCredentials: true });
+      fetchUsers(); // Refresh the list.
+    } catch (error) {
+      console.error('Error blocking/unblocking user:', error);
+    }
   };
 
-  const handleRemoveUser = (id) => {
+  const handleRemoveUser = async (userName) => {
     if (window.confirm("Are you sure you want to remove this user?")) {
-      setUsers(users.filter((user) => user.id !== id));
+      try {
+        await axios.delete(`/api/users/${userName}`, { withCredentials: true });
+        fetchUsers(); // Refresh the list.
+      } catch (error) {
+        console.error('Error removing user:', error);
+      }
     }
   };
 
   // --- Plant Management Functions ---
-  const handleAddPlantSubmit = (plantData) => {
-    const newId = plants.length ? Math.max(...plants.map(p => p.id)) + 1 : 1;
-    const newPlant = { id: newId, ...plantData };
-    setPlants([...plants, newPlant]);
-  };
-
-  const handleEditPlantSubmit = (plantData) => {
-    setPlants(plants.map(p => p.id === plantData.id ? plantData : p));
-  };
-
-  const handleDeletePlant = (id) => {
-    if (window.confirm("Are you sure you want to delete this plant?")) {
-      setPlants(plants.filter(p => p.id !== id));
+  const handleAddPlantSubmit = async (plantData) => {
+    try {
+      await axios.post('/api/plants', plantData, { withCredentials: true });
+      fetchPlants();
+    } catch (error) {
+      console.error("Error adding plant:", error);
     }
   };
 
-  // --- Modal Handlers ---
+  const handleEditPlantSubmit = async (plantData) => {
+    try {
+      await axios.put(`/api/plants/${currentPlant._id}`, plantData, { withCredentials: true });
+      fetchPlants();
+    } catch (error) {
+      console.error("Error updating plant:", error);
+    }
+  };
+
+  const handleDeletePlant = async (plantId) => {
+    if (window.confirm("Are you sure you want to delete this plant?")) {
+      try {
+        await axios.delete(`/api/plants/${plantId}`, { withCredentials: true });
+        fetchPlants();
+      } catch (error) {
+        console.error("Error deleting plant:", error);
+      }
+    }
+  };
+
+  // --- Modal Handlers for Plants ---
   const openPlantModal = (mode, plant = null) => {
     setPlantModalMode(mode);
     setCurrentPlant(plant);
@@ -145,11 +181,10 @@ const Admin = () => {
     setCurrentPlant(null);
   };
 
-  const handlePlantModalSubmit = (e) => {
+  const handlePlantModalSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
     const plantData = {
-      id: currentPlant ? currentPlant.id : null,
       familyName: form.familyName.value.trim(),
       subFamilyName: form.subFamilyName.value.trim(),
       tribeName: form.tribeName.value.trim(),
@@ -162,9 +197,9 @@ const Admin = () => {
       allergicProperties: form.allergicProperties.value.trim()
     };
     if (plantModalMode === 'add') {
-      handleAddPlantSubmit(plantData);
+      await handleAddPlantSubmit(plantData);
     } else {
-      handleEditPlantSubmit(plantData);
+      await handleEditPlantSubmit(plantData);
     }
     closePlantModal();
   };
@@ -179,19 +214,62 @@ const Admin = () => {
     setContextMenu({ ...contextMenu, visible: false });
   };
 
-  // --- Email Response Handler ---
-  const handleRespondEmail = (id) => {
-    alert(`Responding to email with ID: ${id}`);
+  // --- Email Functions ---
+  const handleSelectAllEmails = (checked) => {
+    if (checked) {
+      setSelectedEmails(emails.map(email => email._id));
+    } else {
+      setSelectedEmails([]);
+    }
+  };
+
+  const handleEmailCheckboxChange = (emailId, checked) => {
+    if (checked) {
+      setSelectedEmails(prev => [...prev, emailId]);
+    } else {
+      setSelectedEmails(prev => prev.filter(id => id !== emailId));
+    }
+  };
+
+  const handleDeleteSelectedEmails = async () => {
+    if (window.confirm("Are you sure you want to delete selected emails?")) {
+      try {
+        for (let id of selectedEmails) {
+          await axios.delete(`/api/emails/${id}`, { withCredentials: true });
+        }
+        setSelectedEmails([]);
+        fetchEmails();
+      } catch (error) {
+        console.error("Error deleting selected emails:", error);
+      }
+    }
+  };
+
+  const handleRespondEmail = (email) => {
+    setCurrentEmail(email);
+    setEmailModalOpen(true);
+  };
+
+  const handleEmailModalSubmit = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const reply = form.reply.value.trim();
+    // In a real system, you might call an endpoint to send a reply.
+    alert(`Reply sent to ${currentEmail.sender}: ${reply}`);
+    // After replying, delete the email from the database.
+    try {
+      await axios.delete(`/api/emails/${currentEmail._id}`, { withCredentials: true });
+      fetchEmails();
+    } catch (error) {
+      console.error("Error deleting email after response:", error);
+    }
+    setEmailModalOpen(false);
+    setCurrentEmail(null);
   };
 
   // --- Filtered Data ---
   const filteredUsers = users.filter(user =>
-    user.username.toLowerCase().includes(userSearchTerm.toLowerCase())
-  );
-
-  const filteredEmails = emails.filter(email =>
-    email.sender.toLowerCase().includes(emailSearchTerm.toLowerCase()) ||
-    email.subject.toLowerCase().includes(emailSearchTerm.toLowerCase())
+    user.name && user.name.toLowerCase().includes(userSearchTerm.toLowerCase())
   );
 
   const filteredPlants = plants.filter(plant => {
@@ -209,6 +287,12 @@ const Admin = () => {
       plant.allergicProperties.toLowerCase().includes(term)
     );
   });
+
+  const filteredEmails = emails.filter(email =>
+    (email.name && email.name.toLowerCase().includes(emailSearchTerm.toLowerCase())) ||
+    email.sender.toLowerCase().includes(emailSearchTerm.toLowerCase()) ||
+    (email.message && email.message.toLowerCase().includes(emailSearchTerm.toLowerCase()))
+  );
 
   // --- Rendering Functions ---
 
@@ -262,22 +346,22 @@ const Admin = () => {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Username</th>
+            <th>Name</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {filteredUsers.map((user) => (
-            <tr key={user.id}>
-              <td>{user.id}</td>
-              <td>{user.username}</td>
+            <tr key={user._id}>
+              <td>{user._id}</td>
+              <td>{user.name}</td>
               <td>{user.blocked ? "Blocked" : "Active"}</td>
               <td>
-                <button onClick={() => handleBlockUser(user.id)}>
+                <button onClick={() => handleBlockUser(user.name)}>
                   {user.blocked ? "Unblock" : "Block"}
                 </button>
-                <button onClick={() => handleRemoveUser(user.id)}>Remove</button>
+                <button onClick={() => handleRemoveUser(user.name)}>Remove</button>
               </td>
             </tr>
           ))}
@@ -316,7 +400,7 @@ const Admin = () => {
           </thead>
           <tbody>
             {filteredPlants.map((plant) => (
-              <tr key={plant.id} onContextMenu={(e) => handlePlantRowContextMenu(e, plant.id)}>
+              <tr key={plant._id} onContextMenu={(e) => handlePlantRowContextMenu(e, plant._id)}>
                 <td>{plant.familyName}</td>
                 <td>{plant.subFamilyName}</td>
                 <td>{plant.tribeName}</td>
@@ -346,23 +430,40 @@ const Admin = () => {
           onChange={(e) => setEmailSearchTerm(e.target.value)} 
         />
       </div>
+      {selectedEmails.length > 0 && (
+        <button onClick={handleDeleteSelectedEmails}>Delete Selected</button>
+      )}
       <table>
         <thead>
           <tr>
-            <th>ID</th>
+            <th>
+              <input 
+                type="checkbox" 
+                checked={filteredEmails.length > 0 && selectedEmails.length === filteredEmails.length}
+                onChange={(e) => handleSelectAllEmails(e.target.checked)}
+              />
+            </th>
+            <th>Name</th>
             <th>Sender</th>
-            <th>Subject</th>
+            <th>Message</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {filteredEmails.map((email) => (
-            <tr key={email.id}>
-              <td>{email.id}</td>
-              <td>{email.sender}</td>
-              <td>{email.subject}</td>
+            <tr key={email._id}>
               <td>
-                <button onClick={() => handleRespondEmail(email.id)}>
+                <input 
+                  type="checkbox" 
+                  checked={selectedEmails.includes(email._id)}
+                  onChange={(e) => handleEmailCheckboxChange(email._id, e.target.checked)}
+                />
+              </td>
+              <td>{email.name}</td>
+              <td>{email.sender}</td>
+              <td>{email.message}</td>
+              <td>
+                <button onClick={() => handleRespondEmail(email)}>
                   Respond
                 </button>
               </td>
@@ -410,13 +511,7 @@ const Admin = () => {
           >
             {sidebarCollapsed ? "E" : "Emails"}
           </li>
-          <li
-            className="signout"
-            onClick={() => {
-              localStorage.clear();
-              navigate("/login", { replace: true });
-            }}
-          >
+          <li className="signout" onClick={handleSignOut}>
             {sidebarCollapsed ? "X" : "Sign Out"}
           </li>
         </ul>
@@ -447,7 +542,7 @@ const Admin = () => {
           <div 
             className="context-menu-item" 
             onClick={() => {
-              const plantToEdit = plants.find(p => p.id === contextMenu.plantId);
+              const plantToEdit = plants.find(p => p._id === contextMenu.plantId);
               openPlantModal('edit', plantToEdit);
               handleHideContextMenu();
             }}
@@ -506,6 +601,33 @@ const Admin = () => {
               <div className="modal-buttons">
                 <button type="submit">{plantModalMode === 'add' ? 'Add' : 'Update'}</button>
                 <button type="button" onClick={closePlantModal}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal for Email Response */}
+      {emailModalOpen && currentEmail && (
+        <div className="modal-overlay" onClick={() => setEmailModalOpen(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Responding to {currentEmail.name}</h3>
+            <form onSubmit={handleEmailModalSubmit}>
+              <div className="form-group">
+                <label>Send to:</label>
+                <input type="text" name="to" readOnly defaultValue={currentEmail.sender} />
+              </div>
+              <div className="form-group">
+                <label>Message:</label>
+                <textarea name="message" readOnly defaultValue={currentEmail.message}></textarea>
+              </div>
+              <div className="form-group">
+                <label>Reply:</label>
+                <textarea name="reply" required></textarea>
+              </div>
+              <div className="modal-buttons">
+                <button type="submit">Send</button>
+                <button type="button" onClick={() => setEmailModalOpen(false)}>Cancel</button>
               </div>
             </form>
           </div>
