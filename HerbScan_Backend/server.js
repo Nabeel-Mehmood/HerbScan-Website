@@ -9,6 +9,10 @@ require('dotenv').config();
 connectDB();
 
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+const plantRoutes = require('./routes/plantRoutes');
+const emailRoutes = require('./routes/emailRoutes');
+
 const app = express();
 
 // If you use a proxy (e.g. Create React App proxy), trust it.
@@ -34,8 +38,11 @@ app.use(session({
   }
 }));
 
-// Mount the auth routes.
+// Mount the routes.
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/plants', plantRoutes);
+app.use('/api/emails', emailRoutes);
 
 // Serve static files in production.
 if (process.env.NODE_ENV === 'production') {
