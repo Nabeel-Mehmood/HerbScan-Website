@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import Header from '../Component/header'; // Import the Header component
 import Footer from '../Component/footer'; // Import the Footer component
 import './contact.css';
@@ -9,6 +10,7 @@ function Contact() {
     email: '',
     message: ''
   });
+  const [feedback, setFeedback] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,10 +20,26 @@ function Contact() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic
-    alert('Your message has been submitted!');
+    
+    // Map email field to sender before submission
+    const payload = {
+      name: formData.name,
+      sender: formData.email,  // Renaming 'email' to 'sender'
+      message: formData.message
+    };
+
+    try {
+      const response = await axios.post('/api/emails', payload);
+      if (response.status === 201) {
+        setFeedback('Your message has been submitted!');
+        setFormData({ name: '', email: '', message: '' });
+      }
+    } catch (error) {
+      console.error('Error submitting message:', error);
+      setFeedback('There was an error submitting your message.');
+    }
   };
 
   return (
@@ -30,6 +48,7 @@ function Contact() {
       <main className="contact-main">
         <section className="contact-form-section">
           <h2>Contact Us</h2>
+          {feedback && <p className="feedback">{feedback}</p>}
           <form className="contact-form" onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="name">Name</label>
