@@ -2,10 +2,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Line } from 'react-chartjs-2';
+import { Chart, registerables } from 'chart.js';
 import './Admin.css';
 
+// Register all chart types
+Chart.register(...registerables);
+
 // Helper function to generate a unique ID (for display only)
-// Only used for users since the backend returns only "name" and "blocked".
 const generateUniqueId = () =>
   '_' + Math.random().toString(36).substr(2, 9);
 
@@ -118,11 +122,10 @@ const Admin = () => {
   };
 
   // --- User Management Functions ---
-  // Uses user.name as identifier when calling backend endpoints.
   const handleBlockUser = async (userName) => {
     try {
       await axios.patch(`/api/users/${userName}/block`, {}, { withCredentials: true });
-      fetchUsers(); // Refresh the list.
+      fetchUsers();
     } catch (error) {
       console.error('Error blocking/unblocking user:', error);
     }
@@ -132,7 +135,7 @@ const Admin = () => {
     if (window.confirm("Are you sure you want to remove this user?")) {
       try {
         await axios.delete(`/api/users/${userName}`, { withCredentials: true });
-        fetchUsers(); // Refresh the list.
+        fetchUsers();
       } catch (error) {
         console.error('Error removing user:', error);
       }
@@ -254,9 +257,7 @@ const Admin = () => {
     e.preventDefault();
     const form = e.target;
     const reply = form.reply.value.trim();
-    // In a real system, you might call an endpoint to send a reply.
     alert(`Reply sent to ${currentEmail.sender}: ${reply}`);
-    // After replying, delete the email from the database.
     try {
       await axios.delete(`/api/emails/${currentEmail._id}`, { withCredentials: true });
       fetchEmails();
@@ -296,6 +297,37 @@ const Admin = () => {
 
   // --- Rendering Functions ---
 
+  // Create an example activity graph using Chart.js with react-chartjs-2.
+  // In a production environment, replace the static data with activity metrics from the backend.
+  const activityData = {
+    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    datasets: [
+      {
+        label: 'User Registrations',
+        data: [2, 3, 1, 4, 2, 3, 2],
+        borderColor: 'rgba(75,192,192,1)',
+        fill: false,
+      },
+      {
+        label: 'Plants Added',
+        data: [1, 0, 2, 1, 1, 0, 1],
+        borderColor: 'rgba(255,99,132,1)',
+        fill: false,
+      },
+      {
+        label: 'Emails Received',
+        data: [0, 1, 0, 2, 1, 2, 3],
+        borderColor: 'rgba(54,162,235,1)',
+        fill: false,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    maintainAspectRatio: false,
+    responsive: true,
+  };
+
   const renderDashboard = () => (
     <div className="tab-content dashboard">
       <div className="dashboard-header">
@@ -322,11 +354,9 @@ const Admin = () => {
           <p>{users.filter(u => u.blocked).length}</p>
         </div>
       </div>
-      <div className="dashboard-charts">
+      <div className="dashboard-charts" style={{ height: '300px' }}>
         <h3>Activity Graph</h3>
-        <div className="chart-placeholder">
-          <p>[Graph/Chart Placeholder]</p>
-        </div>
+        <Line data={activityData} options={chartOptions} />
       </div>
     </div>
   );
