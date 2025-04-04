@@ -1,35 +1,30 @@
+// ./Component/UserProfile.js
 import React, { useEffect, useRef, useState } from 'react';
 import './userprofile.css';
-import ProfileImage from '../Assets/userprofile_image.jpg';
+import DefaultProfileImage from '../Assets/userprofile_image.jpg';
 
 function UserProfile({ user, onLogout }) {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(true); // Dropdown initially open
+  const [isDropdownOpen, setIsDropdownOpen] = useState(true);
   const dropdownRef = useRef(null);
 
-  // Close the dropdown when user scrolls
+  // Close dropdown on scroll.
   useEffect(() => {
     const handleScroll = () => {
       setIsDropdownOpen(false);
     };
-
     window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close the dropdown when clicking outside of it
+  // Close dropdown if clicking outside.
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   return (
@@ -37,7 +32,11 @@ function UserProfile({ user, onLogout }) {
       {isDropdownOpen && (
         <div className="user-profile-dropdown" ref={dropdownRef}>
           <div className="user-info">
-            <img src={ProfileImage} alt="Profile" className="profile-picture" />
+            <img
+              src={user.profileImage || DefaultProfileImage}
+              alt="Profile"
+              className="profile-picture"
+            />
             <div className="user-details">
               <h3>{user.name}</h3>
             </div>
@@ -46,7 +45,7 @@ function UserProfile({ user, onLogout }) {
             <button onClick={() => (window.location.href = '/history')}>History</button>
             <button onClick={() => (window.location.href = '/settings')}>Settings</button>
             <button className="logout-button" onClick={onLogout}>
-              Sign out
+              Log out
             </button>
           </div>
         </div>
