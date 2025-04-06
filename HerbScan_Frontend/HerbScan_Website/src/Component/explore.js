@@ -12,11 +12,17 @@ function Explore() {
     existence: '',
     properties: ''
   });
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [selectedPlant, setSelectedPlant] = useState(null);
   const [showScrollArrow, setShowScrollArrow] = useState(true);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [selectedFilters, setSelectedFilters] = useState({
+    family: [],
+    name: [],
+    existence: [],
+    properties: []
+  });
 
   // Refs for scrolling
   const searchSectionRef = useRef(null);
@@ -80,11 +86,21 @@ function Explore() {
     }));
   };
 
-  const disabledFilters = {
-    family: searchFilters.family !== '',
-    name: searchFilters.name !== '',
-    existence: searchFilters.existence !== '',
-    properties: searchFilters.properties !== ''
+  // Handle filter selection for PDF
+  const handleFilterChange = (category, value) => {
+    setSelectedFilters(prev => ({
+      ...prev,
+      [category]: prev[category].includes(value)
+        ? prev[category].filter(item => item !== value)
+        : [...prev[category], value]
+    }));
+  };
+
+  // Download PDF handler
+  const handleDownloadPDF = () => {
+    console.log('Selected filters for download:', selectedFilters);
+    setShowDownloadModal(false);
+    // Add your PDF download logic here
   };
 
   return (
@@ -99,87 +115,11 @@ function Explore() {
       </section>
 
       <main className="explore-main">
-        {/* Scroll arrow */}
         {showScrollArrow && (
           <div className="scroll-down-arrow" onClick={scrollToSearch}>
             <i className="fas fa-chevron-down"></i>
           </div>
         )}
-
-        <section className="explore-search-filter">
-          <h2>Search Filter</h2>
-          <div className="filter-dropdowns">
-            <div className="filter-group">
-              <label htmlFor="family-dropdown">Family Name:</label>
-              <select
-                id="family-dropdown"
-                className="filter-select"
-                value={searchFilters.family}
-                disabled={Object.values(searchFilters).some(
-                  (filter) => filter !== "" && filter !== searchFilters.family
-                )}
-                onChange={(e) => handleSearchFilterChange("family", e.target.value)}
-              >
-                <option value="">Select</option>
-                <option value="family-name">Family Name</option>
-                <option value="sub-family-name">Sub-Family Name</option>
-                <option value="tribe-name">Tribe Name</option>
-              </select>
-            </div>
-
-            <div className="filter-group">
-              <label htmlFor="name-dropdown">Name:</label>
-              <select
-                id="name-dropdown"
-                className="filter-select"
-                value={searchFilters.name}
-                disabled={Object.values(searchFilters).some(
-                  (filter) => filter !== "" && filter !== searchFilters.name
-                )}
-                onChange={(e) => handleSearchFilterChange("name", e.target.value)}
-              >
-                <option value="">Select</option>
-                <option value="botanical-name">Botanical Name</option>
-                <option value="common-name">Common Name</option>
-                <option value="regional-name">Regional Name</option>
-              </select>
-            </div>
-
-            <div className="filter-group">
-              <label htmlFor="existence-dropdown">Existence:</label>
-              <select
-                id="existence-dropdown"
-                className="filter-select"
-                value={searchFilters.existence}
-                disabled={Object.values(searchFilters).some(
-                  (filter) => filter !== "" && filter !== searchFilters.existence
-                )}
-                onChange={(e) => handleSearchFilterChange("existence", e.target.value)}
-              >
-                <option value="">Select</option>
-                <option value="agricultural-existence">Agricultural Existence</option>
-                <option value="seasonal-existence">Seasonal Existence</option>
-              </select>
-            </div>
-
-            <div className="filter-group">
-              <label htmlFor="properties-dropdown">Properties:</label>
-              <select
-                id="properties-dropdown"
-                className="filter-select"
-                value={searchFilters.properties}
-                disabled={Object.values(searchFilters).some(
-                  (filter) => filter !== "" && filter !== searchFilters.properties
-                )}
-                onChange={(e) => handleSearchFilterChange("properties", e.target.value)}
-              >
-                <option value="">Select</option>
-                <option value="medicinal-properties">Medicinal Properties</option>
-                <option value="allergic-properties">Allergic Properties</option>
-              </select>
-            </div>
-          </div>
-        </section>
 
         <section className="explore-search-section" ref={searchSectionRef}>
           <h2>Search for Plants</h2>
@@ -202,10 +142,6 @@ function Explore() {
             </div>
             <div className="search-actions">
               <button className="search-btn" onClick={handleSearch}>Search</button>
-              <button className="advanced-btn" onClick={() => setShowAdvanced(!showAdvanced)}>
-                Advanced
-              </button>
-              <button className="download-btn">Download PDF</button>
             </div>
           </div>
         </section>
@@ -241,67 +177,6 @@ function Explore() {
           </section>
         )}
 
-        {showAdvanced && (
-          <section className="explore-result-filter">
-            <h2>Result Filter</h2>
-            <div className="filter-dropdowns">
-              <div className="filter-group">
-                <label htmlFor="family-dropdown-advanced">Family Name:</label>
-                <select
-                  id="family-dropdown-advanced"
-                  className="filter-select"
-                  disabled={disabledFilters.family}
-                >
-                  <option value="">Select</option>
-                  <option value="family-name">Family Name</option>
-                  <option value="sub-family-name">Sub-Family Name</option>
-                  <option value="tribe-name">Tribe Name</option>
-                </select>
-              </div>
-
-              <div className="filter-group">
-                <label htmlFor="name-dropdown-advanced">Name:</label>
-                <select
-                  id="name-dropdown-advanced"
-                  className="filter-select"
-                  disabled={disabledFilters.name}
-                >
-                  <option value="">Select</option>
-                  <option value="botanical-name">Botanical Name</option>
-                  <option value="common-name">Common Name</option>
-                  <option value="regional-name">Regional Name</option>
-                </select>
-              </div>
-
-              <div className="filter-group">
-                <label htmlFor="existence-dropdown-advanced">Existence:</label>
-                <select
-                  id="existence-dropdown-advanced"
-                  className="filter-select"
-                  disabled={disabledFilters.existence}
-                >
-                  <option value="">Select</option>
-                  <option value="agricultural-existence">Agricultural Existence</option>
-                  <option value="seasonal-existence">Seasonal Existence</option>
-                </select>
-              </div>
-
-              <div className="filter-group">
-                <label htmlFor="properties-dropdown-advanced">Properties:</label>
-                <select
-                  id="properties-dropdown-advanced"
-                  className="filter-select"
-                  disabled={disabledFilters.properties}
-                >
-                  <option value="">Select</option>
-                  <option value="medicinal-properties">Medicinal Properties</option>
-                  <option value="allergic-properties">Allergic Properties</option>
-                </select>
-              </div>
-            </div>
-          </section>
-        )}
-
         <section className="explore-content">
           <div className="explore-card">
             <h2>Plant Categories</h2>
@@ -333,12 +208,17 @@ function Explore() {
             className="plant-detail-panel"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              className="close-btn"
-              onClick={() => setSelectedPlant(null)}
-            >
-              ✕
-            </button>
+            <div className="overlay-header-controls">
+              <button className="download-pdf-btn" onClick={() => setShowDownloadModal(true)}>
+                <i className="fas fa-file-pdf"></i> PDF
+              </button>
+              <button
+                className="close-btn"
+                onClick={() => setSelectedPlant(null)}
+              >
+                ✕
+              </button>
+            </div>
             <div className="plant-detail-header">
               <div className="plant-detail-image-container">
                 {selectedPlant.image ? (
@@ -411,6 +291,75 @@ function Explore() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDownloadModal && (
+        <div className="download-modal-overlay" onClick={() => setShowDownloadModal(false)}>
+          <div className="download-modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2>Select Filters for PDF</h2>
+            <div className="filter-categories">
+              <div className="filter-category">
+                <h3>Family Name</h3>
+                {['Family Name', 'Sub-Family Name', 'Tribe Name'].map(option => (
+                  <label key={option}>
+                    <input
+                      type="checkbox"
+                      checked={selectedFilters.family.includes(option)}
+                      onChange={() => handleFilterChange('family', option)}
+                    />
+                    {option}
+                  </label>
+                ))}
+              </div>
+
+              <div className="filter-category">
+                <h3>Name</h3>
+                {['Botanical Name', 'Common Name', 'Regional Name'].map(option => (
+                  <label key={option}>
+                    <input
+                      type="checkbox"
+                      checked={selectedFilters.name.includes(option)}
+                      onChange={() => handleFilterChange('name', option)}
+                    />
+                    {option}
+                  </label>
+                ))}
+              </div>
+
+              <div className="filter-category">
+                <h3>Existence</h3>
+                {['Agricultural Existence', 'Seasonal Existence'].map(option => (
+                  <label key={option}>
+                    <input
+                      type="checkbox"
+                      checked={selectedFilters.existence.includes(option)}
+                      onChange={() => handleFilterChange('existence', option)}
+                    />
+                    {option}
+                  </label>
+                ))}
+              </div>
+
+              <div className="filter-category">
+                <h3>Properties</h3>
+                {['Medicinal Properties', 'Allergic Properties'].map(option => (
+                  <label key={option}>
+                    <input
+                      type="checkbox"
+                      checked={selectedFilters.properties.includes(option)}
+                      onChange={() => handleFilterChange('properties', option)}
+                    />
+                    {option}
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="modal-actions">
+              <button onClick={handleDownloadPDF}>Download</button>
+              <button onClick={() => setShowDownloadModal(false)}>Cancel</button>
             </div>
           </div>
         </div>
