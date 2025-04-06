@@ -28,7 +28,7 @@ function Explore() {
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
     try {
-      // Adjust the URL as necessary. Here we assume an endpoint exists at /api/plants/search.
+      // Adjust the URL if necessary; ensure your backend search endpoint is mounted correctly.
       const response = await axios.get(`http://localhost:5000/api/plants/search?query=${encodeURIComponent(searchQuery)}`);
       setSearchResults(response.data);
     } catch (error) {
@@ -186,7 +186,7 @@ function Explore() {
         {/* New Section: Search Results */}
         {searchResults.length > 0 && (
           <section className="explore-search-results">
-            <h2>Search Results</h2>
+            <h2>Search for Plants</h2>
             <div className="results-container">
               {searchResults.map((plant) => (
                 <div
@@ -195,7 +195,7 @@ function Explore() {
                   onClick={() => setSelectedPlant(plant)}
                 >
                   <div className="plant-image-placeholder">
-                    {/* Empty placeholder for image */}
+                    {/* Empty placeholder for image; you may later insert an <img> if available */}
                   </div>
                   <div className="plant-info">
                     <h3>{plant.familyName}</h3>
@@ -296,7 +296,7 @@ function Explore() {
         </section>
       </main>
 
-      {/* Detail Overlay Panel for Selected Plant */}
+      {/* Advanced Detail Overlay Panel for Selected Plant */}
       {selectedPlant && (
         <div
           className="plant-detail-overlay"
@@ -309,17 +309,36 @@ function Explore() {
             <button
               className="close-btn"
               onClick={() => setSelectedPlant(null)}
-            >X</button>
-            <h2>{selectedPlant.commonName}</h2>
-            <p><strong>Family Name:</strong> {selectedPlant.familyName}</p>
-            <p><strong>Sub-Family Name:</strong> {selectedPlant.subFamilyName}</p>
-            <p><strong>Tribe Name:</strong> {selectedPlant.tribeName}</p>
-            <p><strong>Botanical Name:</strong> {selectedPlant.botanicalName}</p>
-            <p><strong>Regional Name:</strong> {selectedPlant.regionalName}</p>
-            <p><strong>Agricultural Existence:</strong> {selectedPlant.agriculturalExistence}</p>
-            <p><strong>Season Existence:</strong> {selectedPlant.seasonExistence}</p>
-            <p><strong>Medicinal Properties:</strong> {selectedPlant.medicinalProperties}</p>
-            <p><strong>Allergic Properties:</strong> {selectedPlant.allergicProperties}</p>
+            >
+              X
+            </button>
+            <div className="plant-detail-header">
+              <div className="plant-detail-image-container">
+                {selectedPlant.image ? (
+                  <img
+                    src={selectedPlant.image}
+                    alt={selectedPlant.commonName}
+                    className="plant-detail-image"
+                  />
+                ) : (
+                  <div className="plant-detail-image-placeholder"></div>
+                )}
+              </div>
+              <div className="plant-detail-info">
+                <h2>{selectedPlant.commonName}</h2>
+                <p><strong>Family Name:</strong> {selectedPlant.familyName}</p>
+                <p><strong>Sub-Family Name:</strong> {selectedPlant.subFamilyName}</p>
+              </div>
+            </div>
+            <div className="plant-detail-body">
+              <p><strong>Tribe Name:</strong> {selectedPlant.tribeName}</p>
+              <p><strong>Botanical Name:</strong> {selectedPlant.botanicalName}</p>
+              <p><strong>Regional Name:</strong> {selectedPlant.regionalName}</p>
+              <p><strong>Agricultural Existence:</strong> {selectedPlant.agriculturalExistence}</p>
+              <p><strong>Season Existence:</strong> {selectedPlant.seasonExistence}</p>
+              <p><strong>Medicinal Properties:</strong> {selectedPlant.medicinalProperties}</p>
+              <p><strong>Allergic Properties:</strong> {selectedPlant.allergicProperties}</p>
+            </div>
           </div>
         </div>
       )}
