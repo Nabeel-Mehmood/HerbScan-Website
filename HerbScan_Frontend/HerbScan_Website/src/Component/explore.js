@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import Header from '../Component/header'; // Import the Header component
-import Footer from '../Component/footer'; // Import the Footer component
+import Header from '../Component/header';
+import Footer from '../Component/footer';
 import './explore.css';
 import parallex_background from '../Assets/background1.jpg';
 
@@ -13,22 +13,17 @@ function Explore() {
     properties: ''
   });
   const [showAdvanced, setShowAdvanced] = useState(false);
-
-  // New state for plant search functionality
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [selectedPlant, setSelectedPlant] = useState(null);
 
-  // Handle changes for the dedicated search input
   const handleSearchQueryChange = (e) => {
     setSearchQuery(e.target.value);
   };
 
-  // Call the search API when user hits Enter or clicks the search icon/button
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
     try {
-      // Adjust the URL if necessary; ensure your backend search endpoint is mounted correctly.
       const response = await axios.get(`http://localhost:5000/api/plants/search?query=${encodeURIComponent(searchQuery)}`);
       setSearchResults(response.data);
     } catch (error) {
@@ -37,7 +32,6 @@ function Explore() {
     }
   };
 
-  // Listen for Enter key on the search input
   const handleKeyDownSearch = (e) => {
     if (e.key === 'Enter') {
       handleSearch();
@@ -60,24 +54,19 @@ function Explore() {
 
   return (
     <div className="explore-container">
-      {/* Header Component with the search bar hidden */}
       <Header showSearchBar={false} />
 
-      {/* Parallax Section */}
       <section className="parallax-section" style={{ backgroundImage: `url(${parallex_background})` }}>
         <div className="parallax-content">
-          <p className="parallax-title">Explore the World of HerbScan</p>
+          <p className="parallax-title">Explore the World of Plants with HerbScan</p>
           <p className="parallax-subtitle">Discover insights and information to learn more about plants and trees.</p>
         </div>
       </section>
 
-      {/* Main Explore Page Content */}
       <main className="explore-main">
-        {/* Search Filter Section */}
         <section className="explore-search-filter">
           <h2>Search Filter</h2>
           <div className="filter-dropdowns">
-            {/* Dropdown: Family Name */}
             <div className="filter-group">
               <label htmlFor="family-dropdown">Family Name:</label>
               <select
@@ -96,7 +85,6 @@ function Explore() {
               </select>
             </div>
 
-            {/* Dropdown: Name */}
             <div className="filter-group">
               <label htmlFor="name-dropdown">Name:</label>
               <select
@@ -115,7 +103,6 @@ function Explore() {
               </select>
             </div>
 
-            {/* Dropdown: Existence */}
             <div className="filter-group">
               <label htmlFor="existence-dropdown">Existence:</label>
               <select
@@ -133,7 +120,6 @@ function Explore() {
               </select>
             </div>
 
-            {/* Dropdown: Properties */}
             <div className="filter-group">
               <label htmlFor="properties-dropdown">Properties:</label>
               <select
@@ -153,7 +139,6 @@ function Explore() {
           </div>
         </section>
 
-        {/* Advanced Search Bar Section */}
         <section className="explore-search-section">
           <h2>Search for Plants</h2>
           <div className="search-bar-wrapper">
@@ -183,10 +168,9 @@ function Explore() {
           </div>
         </section>
 
-        {/* New Section: Search Results */}
         {searchResults.length > 0 && (
           <section className="explore-search-results">
-            <h2>Search for Plants</h2>
+            <h2 className="search-results-title">Search Results</h2>
             <div className="results-container">
               {searchResults.map((plant) => (
                 <div
@@ -194,12 +178,20 @@ function Explore() {
                   key={plant._id}
                   onClick={() => setSelectedPlant(plant)}
                 >
-                  <div className="plant-image-placeholder">
-                    {/* Empty placeholder for image; you may later insert an <img> if available */}
+                  <div className="plant-image-container">
+                    {plant.image ? (
+                      <img 
+                        src={plant.image} 
+                        alt={plant.commonName} 
+                        className="plant-image"
+                      />
+                    ) : (
+                      <div className="plant-image-placeholder"></div>
+                    )}
                   </div>
                   <div className="plant-info">
-                    <h3>{plant.familyName}</h3>
-                    <p>{plant.commonName}</p>
+                    <h3>{plant.commonName}</h3>
+                    <p>{plant.familyName}</p>
                   </div>
                 </div>
               ))}
@@ -207,12 +199,10 @@ function Explore() {
           </section>
         )}
 
-        {/* Advanced Filter Section */}
         {showAdvanced && (
           <section className="explore-result-filter">
             <h2>Result Filter</h2>
             <div className="filter-dropdowns">
-              {/* Dropdown: Family Name */}
               <div className="filter-group">
                 <label htmlFor="family-dropdown-advanced">Family Name:</label>
                 <select
@@ -227,7 +217,6 @@ function Explore() {
                 </select>
               </div>
 
-              {/* Dropdown: Name */}
               <div className="filter-group">
                 <label htmlFor="name-dropdown-advanced">Name:</label>
                 <select
@@ -242,7 +231,6 @@ function Explore() {
                 </select>
               </div>
 
-              {/* Dropdown: Existence */}
               <div className="filter-group">
                 <label htmlFor="existence-dropdown-advanced">Existence:</label>
                 <select
@@ -256,7 +244,6 @@ function Explore() {
                 </select>
               </div>
 
-              {/* Dropdown: Properties */}
               <div className="filter-group">
                 <label htmlFor="properties-dropdown-advanced">Properties:</label>
                 <select
@@ -273,7 +260,6 @@ function Explore() {
           </section>
         )}
 
-        {/* Existing Content Cards Section (unchanged) */}
         <section className="explore-content">
           <div className="explore-card">
             <h2>Plant Categories</h2>
@@ -296,7 +282,6 @@ function Explore() {
         </section>
       </main>
 
-      {/* Advanced Detail Overlay Panel for Selected Plant */}
       {selectedPlant && (
         <div
           className="plant-detail-overlay"
@@ -342,7 +327,6 @@ function Explore() {
           </div>
         </div>
       )}
-      {/* Footer Component */}
       <Footer />
     </div>
   );
