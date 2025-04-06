@@ -270,7 +270,7 @@
   margin-bottom: 1.5rem;
 }
 
-/* New Styles for Search Results (keep explore-card styling as is) */
+/* New Styles for Search Results */
 .explore-search-results {
   padding: 2rem;
   background: #ffffff;
@@ -279,6 +279,45 @@
   margin-top: 2rem;
   opacity: 0;
   animation: fadeIn 1s ease-in-out forwards;
+}
+
+.results-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+/* Plant Card for Search Results */
+/* Preserve Explore Card Styling Provided */
+.plant-card {
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  text-align: left;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-top: 2rem;
+  opacity: 0;
+  animation: fadeIn 1.3s ease-in-out forwards;
+}
+
+.plant-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.plant-card h2 {
+  font-size: 1.5rem;
+  color: #2E8B57;
+}
+
+.plant-card p {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: #555;
 }
 
 /* Advanced Plant Detail Overlay Panel */
@@ -354,6 +393,10 @@
   border-radius: 8px;
 }
 
+.plant-detail-info {
+  text-align: left;
+}
+
 .plant-detail-info h2 {
   font-size: 1.8rem;
   color: #2E8B57;
@@ -368,7 +411,7 @@
 .plant-detail-body {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-gap: 1rem;
+  gap: 1rem;
 }
 
 .plant-detail-body p {
@@ -376,14 +419,41 @@
   font-size: 0.95rem;
 }
 
+/* Explore Cards (Original) */
+.explore-card {
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  text-align: left;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-top: 2rem;
+  opacity: 0;
+  animation: fadeIn 1.3s ease-in-out forwards;
+}
+
+.explore-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.explore-card h2 {
+  font-size: 1.5rem;
+  color: #2E8B57;
+}
+
+.explore-card p {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: #555;
+}
+
 /* Keyframe Animations */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes slideUp {
