@@ -103,6 +103,13 @@ function Explore() {
     // Add your PDF download logic here
   };
 
+  // const disabledFilters = {
+  //   family: searchFilters.family !== '',
+  //   name: searchFilters.name !== '',
+  //   existence: searchFilters.existence !== '',
+  //   properties: searchFilters.properties !== ''
+  // };
+
   return (
     <div className="explore-container">
       <Header showSearchBar={false} />
@@ -120,6 +127,81 @@ function Explore() {
             <i className="fas fa-chevron-down"></i>
           </div>
         )}
+
+        <section className="explore-search-filter">
+          <h2>Search Filter</h2>
+          <div className="filter-dropdowns">
+            <div className="filter-group">
+              <label htmlFor="family-dropdown">Family Name:</label>
+              <select
+                id="family-dropdown"
+                className="filter-select"
+                value={searchFilters.family}
+                disabled={Object.values(searchFilters).some(
+                  (filter) => filter !== "" && filter !== searchFilters.family
+                )}
+                onChange={(e) => handleSearchFilterChange("family", e.target.value)}
+              >
+                <option value="">Select</option>
+                <option value="family-name">Family Name</option>
+                <option value="sub-family-name">Sub-Family Name</option>
+                <option value="tribe-name">Tribe Name</option>
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <label htmlFor="name-dropdown">Name:</label>
+              <select
+                id="name-dropdown"
+                className="filter-select"
+                value={searchFilters.name}
+                disabled={Object.values(searchFilters).some(
+                  (filter) => filter !== "" && filter !== searchFilters.name
+                )}
+                onChange={(e) => handleSearchFilterChange("name", e.target.value)}
+              >
+                <option value="">Select</option>
+                <option value="botanical-name">Botanical Name</option>
+                <option value="common-name">Common Name</option>
+                <option value="regional-name">Regional Name</option>
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <label htmlFor="existence-dropdown">Existence:</label>
+              <select
+                id="existence-dropdown"
+                className="filter-select"
+                value={searchFilters.existence}
+                disabled={Object.values(searchFilters).some(
+                  (filter) => filter !== "" && filter !== searchFilters.existence
+                )}
+                onChange={(e) => handleSearchFilterChange("existence", e.target.value)}
+              >
+                <option value="">Select</option>
+                <option value="agricultural-existence">Agricultural Existence</option>
+                <option value="seasonal-existence">Seasonal Existence</option>
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <label htmlFor="properties-dropdown">Properties:</label>
+              <select
+                id="properties-dropdown"
+                className="filter-select"
+                value={searchFilters.properties}
+                disabled={Object.values(searchFilters).some(
+                  (filter) => filter !== "" && filter !== searchFilters.properties
+                )}
+                onChange={(e) => handleSearchFilterChange("properties", e.target.value)}
+              >
+                <option value="">Select</option>
+                <option value="medicinal-properties">Medicinal Properties</option>
+                <option value="allergic-properties">Allergic Properties</option>
+              </select>
+            </div>
+          </div>
+        </section>
 
         <section className="explore-search-section" ref={searchSectionRef}>
           <h2>Search for Plants</h2>
@@ -209,8 +291,11 @@ function Explore() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="overlay-header-controls">
-              <button className="download-pdf-btn" onClick={() => setShowDownloadModal(true)}>
-                <i className="fas fa-file-pdf"></i> PDF
+              <button 
+                className="download-pdf-btn"
+                onClick={() => setShowDownloadModal(true)}
+              >
+                <i className="fas fa-file-pdf"></i> Download PDF
               </button>
               <button
                 className="close-btn"
