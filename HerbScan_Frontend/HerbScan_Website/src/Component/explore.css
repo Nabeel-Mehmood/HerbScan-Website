@@ -3,7 +3,7 @@
   font-family: 'Poppins', sans-serif;
   background-color: #f9f9f9;
   color: #333;
-  min-height: 100vh; /* Ensures full-screen height */
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   animation: fadeIn 1s ease-in-out;
@@ -27,7 +27,7 @@
 }
 
 .parallax-content {
-  background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  background: rgba(0, 0, 0, 0.5);
   padding: 2rem;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -46,7 +46,6 @@
   margin: 0;
 }
 
-/* Main content should take available space */
 .explore-main {
   flex: 1;
   padding: 2rem;
@@ -54,37 +53,97 @@
   animation: slideUp 1s ease-in-out forwards;
 }
 
-.explore-header {
-  background: linear-gradient(90deg, #2E8B57, #e5ffe5);
-  color: white;
+/* Search Results Section */
+.explore-search-results {
   padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  margin-bottom: 2rem;
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 2rem;
   opacity: 0;
-  animation: fadeIn 1.4s ease-in-out forwards;
+  animation: fadeIn 1s ease-in-out forwards;
 }
 
-.explore-header h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
+.search-results-title {
+  font-size: 1.8rem;
+  color: #2E8B57;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #2E8B57;
+  display: inline-block;
+  padding-bottom: 5px;
 }
 
-.explore-header p {
-  font-size: 1.2rem;
-  margin-top: 0;
-}
-
-.explore-content {
+.results-container {
   display: flex;
-  justify-content: center;
   flex-wrap: wrap;
-  gap: 2rem;
-  opacity: 0;
-  animation: fadeIn 1.6s ease-in-out forwards;
+  justify-content: center;
+  gap: 1.5rem;
 }
 
-/* Search Filter Section */
+/* Plant Card Styling */
+.plant-card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  width: 280px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.plant-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.plant-image-container {
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  position: relative;
+}
+
+.plant-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.plant-card:hover .plant-image {
+  transform: scale(1.05);
+}
+
+.plant-image-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+}
+
+.plant-info {
+  padding: 1.2rem;
+  text-align: left;
+}
+
+.plant-info h3 {
+  font-size: 1.2rem;
+  color: #2E8B57;
+  margin-bottom: 0.5rem;
+}
+
+.plant-info p {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+}
+
+/* Rest of your existing CSS remains the same */
 .explore-search-filter {
   padding: 2rem;
   background: #ffffff;
@@ -145,7 +204,6 @@
   margin-bottom: 0.3rem;
 }
 
-/* Explore Search Section */
 .explore-search-section {
   padding: 2rem;
   background: #ffffff;
@@ -245,7 +303,6 @@
   background-color: #80ca00c7;
 }
 
-/* Explore Result Filter Section */
 .explore-result-filter {
   padding: 2rem;
   background: #ffffff;
@@ -270,27 +327,16 @@
   margin-bottom: 1.5rem;
 }
 
-/* New Styles for Search Results */
-.explore-search-results {
-  padding: 2rem;
-  background: #ffffff;
-  border-radius: 15px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  margin-top: 2rem;
-  opacity: 0;
-  animation: fadeIn 1s ease-in-out forwards;
-}
-
-.results-container {
+.explore-content {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
-  gap: 1.5rem;
+  flex-wrap: wrap;
+  gap: 2rem;
+  opacity: 0;
+  animation: fadeIn 1.6s ease-in-out forwards;
 }
 
-/* Plant Card for Search Results */
-/* Preserve Explore Card Styling Provided */
-.plant-card {
+.explore-card {
   background: white;
   border: 1px solid #ccc;
   border-radius: 10px;
@@ -304,23 +350,22 @@
   animation: fadeIn 1.3s ease-in-out forwards;
 }
 
-.plant-card:hover {
+.explore-card:hover {
   transform: translateY(-10px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-.plant-card h2 {
+.explore-card h2 {
   font-size: 1.5rem;
   color: #2E8B57;
 }
 
-.plant-card p {
+.explore-card p {
   margin-top: 0.5rem;
   font-size: 1rem;
   color: #555;
 }
 
-/* Advanced Plant Detail Overlay Panel */
 .plant-detail-overlay {
   position: fixed;
   top: 0;
@@ -419,38 +464,6 @@
   font-size: 0.95rem;
 }
 
-/* Explore Cards (Original) */
-.explore-card {
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 300px;
-  text-align: left;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  margin-top: 2rem;
-  opacity: 0;
-  animation: fadeIn 1.3s ease-in-out forwards;
-}
-
-.explore-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-}
-
-.explore-card h2 {
-  font-size: 1.5rem;
-  color: #2E8B57;
-}
-
-.explore-card p {
-  margin-top: 0.5rem;
-  font-size: 1rem;
-  color: #555;
-}
-
-/* Keyframe Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
