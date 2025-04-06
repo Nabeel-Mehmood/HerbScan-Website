@@ -283,50 +283,87 @@ function Explore() {
       </main>
 
       {selectedPlant && (
-        <div
-          className="plant-detail-overlay"
-          onClick={() => setSelectedPlant(null)}
-        >
-          <div
-            className="plant-detail-panel"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className="close-btn"
-              onClick={() => setSelectedPlant(null)}
-            >
-              X
-            </button>
-            <div className="plant-detail-header">
-              <div className="plant-detail-image-container">
-                {selectedPlant.image ? (
-                  <img
-                    src={selectedPlant.image}
-                    alt={selectedPlant.commonName}
-                    className="plant-detail-image"
-                  />
-                ) : (
-                  <div className="plant-detail-image-placeholder"></div>
-                )}
-              </div>
-              <div className="plant-detail-info">
-                <h2>{selectedPlant.commonName}</h2>
-                <p><strong>Family Name:</strong> {selectedPlant.familyName}</p>
-                <p><strong>Sub-Family Name:</strong> {selectedPlant.subFamilyName}</p>
-              </div>
+  <div className="plant-detail-overlay" onClick={() => setSelectedPlant(null)}>
+    <div className="plant-detail-panel" onClick={(e) => e.stopPropagation()}>
+      <button className="close-btn" onClick={() => setSelectedPlant(null)}>
+        ✕
+      </button>
+      <div className="plant-detail-header">
+        <div className="plant-detail-image-container">
+          {selectedPlant.image ? (
+            <img
+              src={selectedPlant.image}
+              alt={selectedPlant.commonName}
+              className="plant-detail-image"
+            />
+          ) : (
+            <div className="plant-detail-image-placeholder">
+              <i className="fas fa-leaf"></i>
             </div>
-            <div className="plant-detail-body">
-              <p><strong>Tribe Name:</strong> {selectedPlant.tribeName}</p>
-              <p><strong>Botanical Name:</strong> {selectedPlant.botanicalName}</p>
-              <p><strong>Regional Name:</strong> {selectedPlant.regionalName}</p>
-              <p><strong>Agricultural Existence:</strong> {selectedPlant.agriculturalExistence}</p>
-              <p><strong>Season Existence:</strong> {selectedPlant.seasonExistence}</p>
-              <p><strong>Medicinal Properties:</strong> {selectedPlant.medicinalProperties}</p>
-              <p><strong>Allergic Properties:</strong> {selectedPlant.allergicProperties}</p>
+          )}
+        </div>
+        <div className="plant-detail-info">
+          <h2>{selectedPlant.commonName}</h2>
+          <div className="plant-meta">
+            <span className="meta-item">
+              <i className="fas fa-seedling"></i> {selectedPlant.familyName}
+            </span>
+            <span className="meta-item">
+              <i className="fas fa-tag"></i> {selectedPlant.botanicalName}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div className="plant-detail-body">
+        <div className="detail-section">
+          <h3><i className="fas fa-layer-group"></i> Classification</h3>
+          <div className="detail-grid">
+            <div className="detail-item">
+              <span className="detail-label">Family:</span>
+              <span className="detail-value">{selectedPlant.familyName}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Sub-Family:</span>
+              <span className="detail-value">{selectedPlant.subFamilyName}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Tribe:</span>
+              <span className="detail-value">{selectedPlant.tribeName}</span>
             </div>
           </div>
         </div>
-      )}
+
+        <div className="detail-section">
+          <h3><i className="fas fa-info-circle"></i> Properties</h3>
+          <div className="detail-grid">
+            <div className="detail-item">
+              <span className="detail-label">Medicinal:</span>
+              <span className="detail-value">{selectedPlant.medicinalProperties}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Allergic:</span>
+              <span className="detail-value">{selectedPlant.allergicProperties}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="detail-section">
+          <h3><i className="fas fa-calendar-alt"></i> Existence</h3>
+          <div className="detail-grid">
+            <div className="detail-item">
+              <span className="detail-label">Agricultural:</span>
+              <span className="detail-value">{selectedPlant.agriculturalExistence}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Seasonal:</span>
+              <span className="detail-value">{selectedPlant.seasonExistence}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
       <Footer />
     </div>
   );
