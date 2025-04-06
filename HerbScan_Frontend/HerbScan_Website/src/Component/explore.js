@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import Header from '../Component/header'; // Import the Header component
 import Footer from '../Component/footer'; // Import the Footer component
 import './explore.css';
@@ -11,8 +12,37 @@ function Explore() {
     existence: '',
     properties: ''
   });
-
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // New state for plant search functionality
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedPlant, setSelectedPlant] = useState(null);
+
+  // Handle changes for the dedicated search input
+  const handleSearchQueryChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  // Call the search API when user hits Enter or clicks the search icon/button
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+    try {
+      // Adjust the URL as necessary. Here we assume an endpoint exists at /api/plants/search.
+      const response = await axios.get(`http://localhost:5000/api/plants/search?query=${encodeURIComponent(searchQuery)}`);
+      setSearchResults(response.data);
+    } catch (error) {
+      console.error('Error fetching search results:', error);
+      setSearchResults([]);
+    }
+  };
+
+  // Listen for Enter key on the search input
+  const handleKeyDownSearch = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   const handleSearchFilterChange = (filterType, value) => {
     setSearchFilters((prevFilters) => ({
@@ -132,21 +162,50 @@ function Explore() {
                 type="text"
                 className="search-bar"
                 placeholder="Search for plants (e.g., Phulai, Kachnar)..."
+                value={searchQuery}
+                onChange={handleSearchQueryChange}
+                onKeyDown={handleKeyDownSearch}
               />
-              <i className="search-icon fas fa-search"></i>
+              <i
+                className="search-icon fas fa-search"
+                onClick={handleSearch}
+                role="button"
+                tabIndex="0"
+              ></i>
             </div>
             <div className="search-actions">
-              <button className="search-btn">Search</button>
-              <button
-                className="advanced-btn"
-                onClick={() => setShowAdvanced(!showAdvanced)}
-              >
+              <button className="search-btn" onClick={handleSearch}>Search</button>
+              <button className="advanced-btn" onClick={() => setShowAdvanced(!showAdvanced)}>
                 Advanced
               </button>
               <button className="download-btn">Download PDF</button>
             </div>
           </div>
         </section>
+
+        {/* New Section: Search Results */}
+        {searchResults.length > 0 && (
+          <section className="explore-search-results">
+            <h2>Search Results</h2>
+            <div className="results-container">
+              {searchResults.map((plant) => (
+                <div
+                  className="plant-card"
+                  key={plant._id}
+                  onClick={() => setSelectedPlant(plant)}
+                >
+                  <div className="plant-image-placeholder">
+                    {/* Empty placeholder for image */}
+                  </div>
+                  <div className="plant-info">
+                    <h3>{plant.familyName}</h3>
+                    <p>{plant.commonName}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Advanced Filter Section */}
         {showAdvanced && (
@@ -214,6 +273,7 @@ function Explore() {
           </section>
         )}
 
+        {/* Existing Content Cards Section (unchanged) */}
         <section className="explore-content">
           <div className="explore-card">
             <h2>Plant Categories</h2>
@@ -236,6 +296,33 @@ function Explore() {
         </section>
       </main>
 
+      {/* Detail Overlay Panel for Selected Plant */}
+      {selectedPlant && (
+        <div
+          className="plant-detail-overlay"
+          onClick={() => setSelectedPlant(null)}
+        >
+          <div
+            className="plant-detail-panel"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="close-btn"
+              onClick={() => setSelectedPlant(null)}
+            >X</button>
+            <h2>{selectedPlant.commonName}</h2>
+            <p><strong>Family Name:</strong> {selectedPlant.familyName}</p>
+            <p><strong>Sub-Family Name:</strong> {selectedPlant.subFamilyName}</p>
+            <p><strong>Tribe Name:</strong> {selectedPlant.tribeName}</p>
+            <p><strong>Botanical Name:</strong> {selectedPlant.botanicalName}</p>
+            <p><strong>Regional Name:</strong> {selectedPlant.regionalName}</p>
+            <p><strong>Agricultural Existence:</strong> {selectedPlant.agriculturalExistence}</p>
+            <p><strong>Season Existence:</strong> {selectedPlant.seasonExistence}</p>
+            <p><strong>Medicinal Properties:</strong> {selectedPlant.medicinalProperties}</p>
+            <p><strong>Allergic Properties:</strong> {selectedPlant.allergicProperties}</p>
+          </div>
+        </div>
+      )}
       {/* Footer Component */}
       <Footer />
     </div>
