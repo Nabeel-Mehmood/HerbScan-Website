@@ -15,6 +15,7 @@ const emailRoutes = require('./routes/emailRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const plantSearchRoutes = require('./routes/plantSearchRoutes');
+const plantDownloadRoutes = require('./routes/plantDownloadRoutes');
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.use('/api/emails', emailRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/plants', plantSearchRoutes);
+app.use('/api/plants', plantDownloadRoutes);
 
 // Serve static files from the uploads folder.
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
