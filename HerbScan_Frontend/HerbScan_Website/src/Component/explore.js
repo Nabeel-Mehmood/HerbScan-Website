@@ -15,7 +15,7 @@ function Explore() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [selectedPlant, setSelectedPlant] = useState(null);
-  const [showScrollArrow, setShowScrollArrow] = useState(true);
+  const [showScrollArrow, setShowScrollArrow] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState({
     family: [],
@@ -28,22 +28,55 @@ function Explore() {
   const searchSectionRef = useRef(null);
   const resultsSectionRef = useRef(null);
 
-  // Show scroll arrow on initial load and hide after 5 seconds
+  // Handle scroll arrow visibility
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowScrollArrow(false);
-    }, 5000);
+    const handleScroll = () => {
+      if (searchSectionRef.current) {
+        const searchSectionTop = searchSectionRef.current.getBoundingClientRect().top;
+        // Show arrow only if search section is not in view
+        setShowScrollArrow(searchSectionTop > window.innerHeight);
+      }
+    };
 
-    return () => clearTimeout(timer);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Handle search
+  // Handle search with optional column filtering.
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
+    
+    // Mapping from dropdown option value to model field name.
+    const columnMapping = {
+      "family-name": "familyName",
+      "sub-family-name": "subFamilyName",
+      "tribe-name": "tribeName",
+      "botanical-name": "botanicalName",
+      "common-name": "commonName",
+      "regional-name": "regionalName",
+      "agricultural-existence": "agriculturalExistence",
+      "seasonal-existence": "seasonExistence",
+      "medicinal-properties": "medicinalProperties",
+      "allergic-properties": "allergicProperties"
+    };
+
+    let filterColumn = "";
+    if (searchFilters.family) {
+      filterColumn = columnMapping[searchFilters.family];
+    } else if (searchFilters.name) {
+      filterColumn = columnMapping[searchFilters.name];
+    } else if (searchFilters.existence) {
+      filterColumn = columnMapping[searchFilters.existence];
+    } else if (searchFilters.properties) {
+      filterColumn = columnMapping[searchFilters.properties];
+    }
+    
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/plants/search?query=${encodeURIComponent(searchQuery)}`
-      );
+      let url = `http://localhost:5000/api/plants/search?query=${encodeURIComponent(searchQuery)}`;
+      if (filterColumn) {
+        url += `&column=${encodeURIComponent(filterColumn)}`;
+      }
+      const response = await axios.get(url);
       setSearchResults(response.data);
       
       // Scroll to results after search
@@ -61,21 +94,20 @@ function Explore() {
     }
   };
 
-  // Handle Enter key in search
+  // Handle Enter key in search input.
   const handleKeyDownSearch = (e) => {
     if (e.key === 'Enter') {
       handleSearch();
     }
   };
 
-  // Scroll to search section
+  // Scroll to search section.
   const scrollToSearch = () => {
     if (searchSectionRef.current) {
       searchSectionRef.current.scrollIntoView({ 
         behavior: 'smooth',
         block: 'start'
       });
-      setShowScrollArrow(false);
     }
   };
 
@@ -86,7 +118,7 @@ function Explore() {
     }));
   };
 
-  // Handle filter selection for PDF
+  // Handle filter selection for PDF download.
   const handleFilterChange = (category, value) => {
     setSelectedFilters(prev => ({
       ...prev,
@@ -96,19 +128,28 @@ function Explore() {
     }));
   };
 
-  // Download PDF handler
-  const handleDownloadPDF = () => {
-    console.log('Selected filters for download:', selectedFilters);
+  // Download PDF: send the selected plant and filter options.
+  const handleDownloadPDF = async () => {
+    try {
+      const payload = {
+        filters: selectedFilters
+      };
+      const response = await axios.post(
+        `http://localhost:5000/api/plants/${selectedPlant._id}/download`, 
+        payload,
+        { responseType: 'blob' }
+      );
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${selectedPlant.commonName}-details.pdf`);
+      document.body.appendChild(link);
+      link.click();
+    } catch (error) {
+      console.error('PDF Download failed:', error);
+    }
     setShowDownloadModal(false);
-    // Add your PDF download logic here
   };
-
-  // const disabledFilters = {
-  //   family: searchFilters.family !== '',
-  //   name: searchFilters.name !== '',
-  //   existence: searchFilters.existence !== '',
-  //   properties: searchFilters.properties !== ''
-  // };
 
   return (
     <div className="explore-container">
@@ -127,6 +168,11 @@ function Explore() {
             <i className="fas fa-chevron-down"></i>
           </div>
         )}
+
+        {/* New Scroll To Bottom Button */}
+        <button className="scroll-to-search-btn" onClick={scrollToSearch}>
+          <i className="fas fa-angle-double-down"></i> Go to Search
+        </button>
 
         <section className="explore-search-filter">
           <h2>Search Filter</h2>
