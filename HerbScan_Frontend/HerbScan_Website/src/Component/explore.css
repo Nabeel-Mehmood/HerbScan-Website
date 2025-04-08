@@ -632,7 +632,96 @@
   }
 }
 
+/* Add these new styles */
+.download-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  backdrop-filter: blur(5px);
+}
 
+.download-modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.filter-categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin: 1.5rem 0;
+}
+
+.filter-category {
+  background: #f8f8f8;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.filter-category h3 {
+  color: #2E8B57;
+  margin-bottom: 0.8rem;
+  font-size: 1.1rem;
+}
+
+.filter-category label {
+  display: block;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: #444;
+  cursor: pointer;
+}
+
+.filter-category input[type="checkbox"] {
+  margin-right: 0.8rem;
+  transform: scale(1.1);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+.modal-actions button {
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modal-actions button:first-child {
+  background: #2E8B57;
+  color: white;
+}
+
+.modal-actions button:first-child:hover {
+  background: #256b47;
+}
+
+.modal-actions button:last-child {
+  background: #ddd;
+  color: #333;
+}
+
+.modal-actions button:last-child:hover {
+  background: #ccc;
+}
 
 
 
