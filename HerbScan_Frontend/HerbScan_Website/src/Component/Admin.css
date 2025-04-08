@@ -193,6 +193,77 @@ table tr {
   background-color: #138d75;
 }
 
+/* Pagination Controls */
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 15px 0;
+  padding: 10px 0;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+
+.pagination-controls.bottom {
+  border-top: none;
+  margin-top: 15px;
+}
+
+.items-per-page {
+  display: flex;
+  align-items: center;
+}
+
+.items-per-page label {
+  margin-right: 10px;
+  font-size: 0.9rem;
+  color: #2c3e50;
+}
+
+.items-per-page select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.page-info {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+}
+
+.page-navigation {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-navigation button {
+  padding: 8px 15px;
+  background-color: #16a085;
+  border: none;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.page-navigation button:hover {
+  background-color: #138d75;
+}
+
+.page-navigation button:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+}
+
+.page-navigation span {
+  font-size: 0.9rem;
+  color: #2c3e50;
+}
+
 /* Table Wrapper for horizontal scrolling */
 .table-wrapper {
   overflow-x: auto;
@@ -389,6 +460,18 @@ button:hover {
   
   .admin-main {
     padding: 15px;
+  }
+
+  /* Stack pagination controls on mobile */
+  .pagination-controls {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .page-navigation {
+    width: 100%;
+    justify-content: space-between;
   }
 }
 
