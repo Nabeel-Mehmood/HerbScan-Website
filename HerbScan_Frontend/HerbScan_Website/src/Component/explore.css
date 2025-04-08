@@ -723,5 +723,76 @@
   background: #ccc;
 }
 
+.overlay-header-controls {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  gap: 1rem;
+  z-index: 10;
+}
 
+.download-pdf-btn {
+  background: #2E8B57;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.download-pdf-btn:hover {
+  background: #256b47;
+  transform: translateY(-2px);
+}
+
+/* Remove the advanced button styles */
+.advanced-btn {
+  display: none !important;
+}
+
+.plant-detail-panel {
+  position: relative;
+  /* other existing styles */
+}
+
+/* Download pdf button and close button */
+.overlay-header-controls {
+  position: absolute;
+  top: 26px;
+  right: 16px;
+  display: flex;
+  gap: 10px;
+  z-index: 1;
+}
+
+.download-pdf-btn {
+  background-color: #088917;
+  color: white;
+  border: none;
+  padding: 14px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.download-pdf-btn i {
+  font-size: 16px;
+}
+
+.close-btn {
+  background-color: transparent;
+  border: none;
+  font-size: 20px;
+  Top: 60px;
+  color: #333;
+  cursor: pointer;
+}
 
