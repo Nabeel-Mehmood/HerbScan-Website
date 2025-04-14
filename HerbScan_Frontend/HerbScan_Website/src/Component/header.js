@@ -1,3 +1,4 @@
+// ./Component/header.js
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './header.css';
@@ -5,13 +6,13 @@ import Logo from '../Assets/logo.png';
 import ProfileImage from '../Assets/userprofile_image.jpg';
 import UserProfile from './userprofile';
 
-function Header({ showSearchBar = true }) {
+function Header({ showSearchBar = true, onSearch }) {
+  const [searchQuery, setSearchQuery] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  // Consistent API URL using environment variables.
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/auth';
 
   useEffect(() => {
@@ -68,6 +69,19 @@ function Header({ showSearchBar = true }) {
     setShowDropdown(prev => !prev);
   };
 
+  // Handler triggered when the user clicks search or presses Enter.
+  const handleSearch = () => {
+    if (onSearch && typeof onSearch === "function") {
+      onSearch(searchQuery);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   return (
     <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
       <div className="logo-container" onClick={() => window.location.href = '/'}>
@@ -77,8 +91,15 @@ function Header({ showSearchBar = true }) {
 
       {showSearchBar && (
         <div className="search-bar-container">
-          <input type="text" placeholder="Search..." className="search-bar" />
-          <i className="search-icon fas fa-search"></i>
+          <input 
+            type="text" 
+            placeholder="Search..." 
+            className="search-bar" 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          <i className="search-icon fas fa-search" onClick={handleSearch}></i>
         </div>
       )}
 
