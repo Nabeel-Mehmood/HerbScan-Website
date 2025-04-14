@@ -3,142 +3,33 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  font-family: Arial, sans-serif;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f9f9f9;
 }
 
 
-/* Parallax Sections */
-.parallax-section {
-  position: relative;
-  background-attachment: fixed;
-  background-size: cover;
-  background-repeat: no-repeat;
-  width: 100%;
-}
-
-.search-section {
-  background-image: url('../Assets/background1.jpg');
-  height: 30vh;
+/* File Upload Section */
+.upload-section {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.content-section {
+  padding: 10rem;
   background-image: url('../Assets/background2.jpg');
-  height: 100vh;
-  display: flex;
-  gap: 5rem;
-  justify-content: center;
-  align-items: center;
+  background-size: cover;
+  background-attachment: fixed;
 }
 
-
-/* Body Content */
-.body-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 2rem;
-}
-
-/* Search bar */
-.search-bar-container {
-  position: relative; /* Allows the icon to be positioned inside */
-  width: calc(100% - 160px);
-  max-width: 500px;
-  margin: 1rem auto 2rem; /* Center the container horizontally */
-  display: flex;
-  align-items: center;
-  margin-left: auto;
-}
-
-.search-bar {
-  width: 100%;
-  padding: 16px 30px 16px 16px; /* Adjust padding to provide space on the right for the icon */
-  font-size: 15px; /* Increased font size for better readability */
-  border-radius: 08px; /* Rounded corners */
-  border: 1px solid #ccc;
-  background-color: #f8f8f8;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  opacity: 0;
-  animation: fadeIn 1s forwards;
-}
-
-.search-bar:focus {
-  outline: none;
-  border: 1px solid #4CAF50;
-  box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
-}
-
-/* Search Icon Styling */
-.search-icon {
-  position: absolute;
-  right: 12px; /* Position icon on the right */
-  top: 50%;
-  transform: translateY(-50%); /* Vertically center the icon */
-  font-size: 20x; /* Adjust icon size */
-  color: #aaa;
-  transition: color 0.3s;
-}
-
-.search-bar:focus ~ .search-icon {
-  color: #4CAF50; /* Change icon color on focus */
-}
-
-/* Fade-in animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-
-
-/* Main Content Styling */
-.content-section {
-display: flex;
-gap: 5rem; /* Space between file-upload and image-slider */
-width: 100%;
-margin-top: 2rem;
-align-items: center; /* Aligns items vertically centered */
-justify-content: center; /* Centers content-section horizontally */
-}
-
-
-/* Upload Section */ 
-.upload-section { 
-  display: flex; 
-  justify-content: center; 
-  align-items: center; 
-  width: 100%; 
-  height: 100vh; 
-  background-image: url('../Assets/background2.jpg'); 
-  background-size: cover; 
-  background-attachment: fixed; 
-}
-
-
-/* File Upload */
 .file-upload {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: 1rem;
   background: linear-gradient(135deg, #e3f2fd, #c8e6c9);
   border: 2px dashed #4CAF50;
   border-radius: 20px;
-  width: 400px; /* Adjust width */
-  height: 250px; /* Adjust height */
-  margin-left: 3rem;
+  width: 600px;
+  height: 350px;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
@@ -159,7 +50,6 @@ justify-content: center; /* Centers content-section horizontally */
 
 .upload-label span {
   color: #007BFF;
-  /* text-decoration: underline; */
 }
 
 .upload-label:hover {
@@ -170,7 +60,6 @@ justify-content: center; /* Centers content-section horizontally */
   font-size: 48px;
   color: #4CAF50;
   margin-bottom: 10px;
-  margin-right: 10px;
   transition: transform 0.3s ease;
 }
 
@@ -179,7 +68,7 @@ justify-content: center; /* Centers content-section horizontally */
 }
 
 #file-upload-input {
-  display: none; /* Hide the default file input */
+  display: none;
 }
 
 .upload-note {
@@ -189,8 +78,6 @@ justify-content: center; /* Centers content-section horizontally */
   text-align: center;
 }
 
-
-/* Display uploaded file */
 /* Uploaded Image Section */
 .uploaded-image-container {
   margin-top: 20px;
@@ -212,15 +99,18 @@ justify-content: center; /* Centers content-section horizontally */
   margin-top: 15px;
 }
 
-.identify-btn {
-  background-color: #4CAF50;
-  color: white;
+.identify-btn, .remove-btn {
   padding: 10px 15px;
   border: none;
   border-radius: 5px;
   font-size: 16px;
   cursor: pointer;
   transition: background 0.3s ease;
+}
+
+.identify-btn {
+  background-color: #4CAF50;
+  color: white;
 }
 
 .identify-btn:hover {
@@ -230,12 +120,6 @@ justify-content: center; /* Centers content-section horizontally */
 .remove-btn {
   background-color: #FF5252;
   color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.3s ease;
 }
 
 .remove-btn:hover {
@@ -249,101 +133,198 @@ justify-content: center; /* Centers content-section horizontally */
   color: #555;
 }
 
+/* Info Section */
+.info-section {
+  padding: 2rem;
+  background: #ffffff;
+}
 
-/* Info and Slider Section */ 
-.info-slider-section { 
-  display: flex; 
-  gap: 5rem; 
-  width: 100%; 
-  padding: 2rem; 
-  background: #ffffff; 
-  align-items: center; 
-  justify-content: space-around; 
+.content-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.website-info {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  color: #333;
+}
+
+.website-info h2 {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #2E8B57;
+}
+
+.website-info p {
+  font-size: 18px;
+  line-height: 1.5;
+  color: #666;
+}
+
+/* Home Search Overlay */
+.home-search-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  backdrop-filter: blur(5px);
+}
+
+.overlay-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   text-align: center;
 }
 
-
-.website-info { 
-  flex: 1; 
-  /* max-width: 400px;  */
-}
-
-.website-info h2 { 
-  font-size: 28px; 
-  font-weight: bold; 
-  color: #333; 
-  margin-bottom: 1rem; 
-}
-
-.website-info p { 
-  font-size: 18px; 
-  line-height: 1.5; 
-  color: #666; 
-}
-
-
-/* Swiper Image Slider */
-.image-slider {
-  flex: 1;
-  width: 100%; /* Increased width for better visibility */
-  max-width: 600px;
-  height: 380px;
-  position: relative; /* For positioning arrows and indicators */
-  margin: auto; /* Center align */
+.cards-container {
   display: flex;
-  align-items: center;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.6));
-  border-radius: 15px;
-  margin-right: 5rem;
-  overflow: hidden;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
 }
 
-.image-slider img {
+.search-card {
+  background: white;
+  border-radius: 10px;
+  width: 280px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+.search-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.card-image {
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+}
+
+.card-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 15px;
-  transition: transform 0.5s ease, filter 0.5s ease;
+  transition: transform 0.5s ease;
 }
 
-.image-slider img:hover {
-  transform: scale(1.05); /* Zoom effect on hover */
-  filter: brightness(1.2); /* Slightly brighten the image */
+.card-image img:hover {
+  transform: scale(1.05);
 }
 
-
-/* Caption for Slides */
-.slide-container {
-  position: relative;
+.image-placeholder {
   width: 100%;
   height: 100%;
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2E8B57;
+  font-size: 3rem;
 }
 
-.caption {
-  position: absolute;
-  bottom: 10%;
-  left: 50%;
-  transform: translateX(-50%);
-  /* background: rgba(0, 0, 0, 0.6); */
+.card-info {
+  padding: 1rem;
+  text-align: left;
+  color: #333;
+}
+
+.card-info p {
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
+}
+
+.card-info p strong {
+  font-size: 1rem;
+  color: #2E8B57;
+}
+
+.card-more-info {
+  padding: 0.5rem 1rem;
+  text-align: right;
+}
+
+.card-more-info button {
+  background: #2E8B57;
   color: white;
-  padding: 10px 20px;
-  font-size: 1.2rem;
-  font-weight: 600;
-  border-radius: 5px;
-  text-align: center;
-  opacity: 0;
-  animation: fadeIn 1s ease forwards;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
 
-/* Caption Animation */
+.card-more-info button:hover {
+  background: #256b47;
+}
+
+/* Close overlay button */
+.close-overlay {
+  margin-top: 1rem;
+  padding: 0.7rem 1.5rem;
+  background: #ddd;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.close-overlay:hover {
+  background: #ccc;
+}
+
+/* Keyframe Animation */
 @keyframes fadeIn {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* About HerbScan Section */
+.info-section {
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, #f8fff8, #ffffff);
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.website-info {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.website-info h2 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2E8B57;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.website-info p {
+  font-size: 20px;
+  line-height: 1.6;
+  color: #555;
+  margin: 0 auto;
+  max-width: 700px;
 }
