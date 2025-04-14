@@ -13,6 +13,7 @@ function Explore() {
     properties: ''
   });
   const [searchQuery, setSearchQuery] = useState('');
+  const [autoCompleteSuggestions, setAutoCompleteSuggestions] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [selectedPlant, setSelectedPlant] = useState(null);
   const [showScrollArrow, setShowScrollArrow] = useState(false);
@@ -41,6 +42,30 @@ function Explore() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Debounce search query and fetch autoComplete suggestions.
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (searchQuery.trim().length > 1) {
+        // We use the same search endpoint without the column filter for suggestions.
+        axios
+          .get(`http://localhost:5000/api/plants/search?query=${encodeURIComponent(searchQuery)}`)
+          .then((response) => {
+            // For suggestions, we can filter and take the first 5 results.
+            const suggestions = response.data.slice(0, 5);
+            setAutoCompleteSuggestions(suggestions);
+          })
+          .catch((error) => {
+            console.error('AutoComplete error:', error);
+            setAutoCompleteSuggestions([]);
+          });
+      } else {
+        setAutoCompleteSuggestions([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchQuery]);
 
   // Handle search with optional column filtering.
   const handleSearch = async () => {
@@ -78,6 +103,9 @@ function Explore() {
       }
       const response = await axios.get(url);
       setSearchResults(response.data);
+      
+      // Clear suggestions after search.
+      setAutoCompleteSuggestions([]);
       
       // Scroll to results after search
       setTimeout(() => {
@@ -120,12 +148,20 @@ function Explore() {
 
   // Handle filter selection for PDF download.
   const handleFilterChange = (category, value) => {
-    setSelectedFilters(prev => ({
+    setSelectedFilters((prev) => ({
       ...prev,
       [category]: prev[category].includes(value)
-        ? prev[category].filter(item => item !== value)
+        ? prev[category].filter((item) => item !== value)
         : [...prev[category], value]
     }));
+  };
+
+  // When a suggestion is clicked, set the search query and perform search.
+  const handleSuggestionClick = (suggestion) => {
+    // Assuming we want to use the suggestion's commonName.
+    setSearchQuery(suggestion.commonName);
+    setAutoCompleteSuggestions([]);
+    handleSearch();
   };
 
   // Download PDF: send the selected plant and filter options.
@@ -169,7 +205,7 @@ function Explore() {
           </div>
         )}
 
-        {/* New Scroll To Bottom Button */}
+        {/* New Scroll-To-Search Button */}
         <button className="scroll-to-search-btn" onClick={scrollToSearch}>
           <i className="fas fa-angle-double-down"></i> Go to Search
         </button>
@@ -252,7 +288,7 @@ function Explore() {
         <section className="explore-search-section" ref={searchSectionRef}>
           <h2>Search for Plants</h2>
           <div className="search-bar-wrapper">
-            <div className="search-bar-container">
+            <div className="search-bar-container" style={{ position: 'relative' }}>
               <input
                 type="text"
                 className="search-bar"
@@ -267,6 +303,19 @@ function Explore() {
                 role="button"
                 tabIndex="0"
               ></i>
+              {autoCompleteSuggestions.length > 0 && (
+                <div className="autocomplete-suggestions">
+                  {autoCompleteSuggestions.map((suggestion) => (
+                    <div
+                      key={suggestion._id}
+                      className="suggestion-item"
+                      onClick={() => handleSuggestionClick(suggestion)}
+                    >
+                      {suggestion.commonName}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="search-actions">
               <button className="search-btn" onClick={handleSearch}>Search</button>
