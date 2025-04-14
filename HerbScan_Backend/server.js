@@ -16,6 +16,8 @@ const profileRoutes = require('./routes/profileRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const plantSearchRoutes = require('./routes/plantSearchRoutes');
 const plantDownloadRoutes = require('./routes/plantDownloadRoutes');
+const plantHomeSearchRoutes = require('./routes/plantHomeSearchRoutes');
+const classificationRoutes = require('./routes/classificationRoutes');
 
 const app = express();
 
@@ -49,6 +51,8 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/plants', plantSearchRoutes);
 app.use('/api/plants', plantDownloadRoutes);
+app.use('/api/plants', plantHomeSearchRoutes);
+app.use('/api/plants', classificationRoutes);
 
 // Serve static files from the uploads folder.
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
