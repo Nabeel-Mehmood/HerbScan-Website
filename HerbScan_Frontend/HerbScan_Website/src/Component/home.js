@@ -107,7 +107,51 @@ function Home() {
     <div className="home-container">
       <Header showSearchBar={true} onSearch={handleHomeSearch} />
 
-      
+      <section className="upload-section">
+        <div
+          className="file-upload"
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+        >
+          {!uploadedImage ? (
+            <>
+              <label htmlFor="file-upload-input" className="upload-label">
+                <i className="fas fa-cloud-upload-alt upload-icon"></i>
+                Drag & Drop your file here or <span>Browse</span>
+              </label>
+              <input
+                type="file"
+                id="file-upload-input"
+                onChange={handleFileChange}
+                style={{ display: 'none' }}
+              />
+              <p className="upload-note">Supported formats: JPG, PNG</p>
+            </>
+          ) : (
+            <div className="uploaded-image-container">
+              <img
+                src={uploadedImage}
+                alt="Uploaded preview"
+                className="uploaded-image"
+              />
+              <div className="buttons-container">
+                <button className="identify-btn" onClick={handleIdentify}>
+                  Identify
+                </button>
+                <button className="remove-btn" onClick={handleRemove}>
+                  Remove
+                </button>
+              </div>
+              {classificationResult && (
+                <div className="classification-result">
+                  <p><strong>Predicted:</strong> {classificationResult.predicted_class}</p>
+                  <p>Confidence: {classificationResult.confidence.toFixed(2)}%</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </section>
 
       <section className="info-section content-section">
         <div className="website-info">
